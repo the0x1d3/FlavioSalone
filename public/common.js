@@ -73,6 +73,22 @@ Object.assign(actions.click, {
   reloadPage: () => location.reload(),
 });
 actions.focus.select = (el) => el.select();
+
+// Tema buttons (data-click="setTheme", data-arg auto | light | dark), on both pages: the choice stays on this device
+// and theme.js applies it.
+function markTheme() {
+  const pick = document.documentElement.dataset.themePick || 'auto';
+  document.querySelectorAll('[data-click="setTheme"]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.arg === pick));
+}
+actions.click.setTheme = (el) => {
+  try {
+    if (el.dataset.arg === 'auto') localStorage.removeItem('sp_theme');
+    else localStorage.setItem('sp_theme', el.dataset.arg);
+  } catch {}
+  window.applyTheme?.();
+  markTheme();
+};
+markTheme();
 document.addEventListener('keydown', (e) => {
   const open = [...document.querySelectorAll('.modal-backdrop.open')].pop();
   if (e.key === 'Escape' && open && !open.dataset.locked) closeModal(open.id);

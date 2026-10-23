@@ -1,6 +1,10 @@
 // ---------- Novità ----------
 // Newest first. Add an entry at every update: it pops up once on each device, then stays under "Novità".
 const NEWS = [
+  { v: '1.13', date: '23 ottobre 2026', title: 'Tema chiaro o scuro e guide passo passo', items: [
+    ['ph-circle-half', 'Scegli tu il tema: Auto segue il telefono, oppure Chiaro o Scuro. Il selettore è in fondo al menu (su telefono in "Altro") e in fondo alla pagina di prenotazione. La scelta resta su quel dispositivo.'],
+    ['ph-book-open', 'In Impostazioni, accanto a SMS automatici e Notifiche sul telefono, trovi "Guida passo passo": spiega cosa toccare su Android, iPhone e computer e cosa fare se qualcosa non va.'],
+  ] },
   { v: '1.12', date: '23 ottobre 2026', title: 'SMS automatici e notifiche sul telefono', items: [
     ['ph-chat-text', "Le clienti ricevono un SMS di conferma appena prendi l'appuntamento (anche online) e un promemoria il giorno prima. Partono dal telefono del salone con la sua SIM: si attivano in Impostazioni."],
     ['ph-bell-ringing', 'Il telefono ti avvisa delle nuove prenotazioni online anche con l\'app chiusa, e ogni mattina ti manda il riepilogo della giornata. Attivale in Impostazioni su ogni telefono.'],

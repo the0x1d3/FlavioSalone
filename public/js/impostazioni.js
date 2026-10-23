@@ -345,6 +345,7 @@ async function renderNotify() {
       </div>`).join('') || '<p class="muted small">Ancora nessun SMS inviato.</p>';
   }
   $('sms-retry').hidden = !recent.some((m) => m.status === 'failed');
+  $('sms-cron-note').hidden = !info || info.cron || !s.enabled || s.reminder === false;
 
   // Push on this device
   const iosNeedsInstall = isIOS && !isStandalone;
@@ -360,7 +361,7 @@ async function renderNotify() {
   const n = info?.pushDevices || 0;
   $('push-devices').textContent = state === 'denied' ? 'Hai negato il permesso: riattivalo dalle impostazioni del telefono (Notifiche, sito o app Salone PRO) e torna qui.'
     : state === 'unsupported' ? 'Questo browser non riceve notifiche: usa Chrome su Android o computer, oppure l\'app installata su iPhone.'
-    : n ? `Dispositivi che ricevono le notifiche: ${n}.` : '';
+    : [n ? `Dispositivi che ricevono le notifiche: ${n}.` : '', info && !info.cron ? 'Il riepilogo del mattino non parte finché su Vercel manca la variabile CRON_SECRET.' : ''].filter(Boolean).join(' ');
 }
 
 async function enablePush() {
@@ -443,6 +444,16 @@ async function testSms() {
   }
   loadNotify();
 }
+// Opens one guide (sms or push) on the part for this device; for SMS, the phone chosen in the panel.
+function openGuide(kind) {
+  const os = kind === 'sms' ? (smsChannel === 'iphone' ? 'ios' : 'android') : deviceOs;
+  document.querySelectorAll('#guide-modal [data-guide]').forEach((g) => {
+    g.hidden = g.dataset.guide !== kind;
+    if (!g.hidden) $('guide-title').textContent = g.dataset.title;
+    g.querySelectorAll('details').forEach((d) => { d.open = d.dataset.os === os; });
+  });
+  openModal('guide-modal');
+}
 function retrySms() {
   api('POST', '/api/notify', { action: 'retry' }).then(() => loadNotify()).catch((e) => toast(e.message, 'error'));
 }
@@ -451,6 +462,7 @@ function retrySms() {
 Object.assign(actions.click, {
   signClientGdprInSalon, printPaperGdprForm, saveConfig, openOnboarding, saveClosures, exportBackup, installApp, openInstallGuide, dismissInstall,
   enablePush, disablePush, testPush, saveSms, testSms, retrySms,
+  openGuide: (el) => openGuide(el.dataset.arg),
   saveGateway: () => saveGateway(),
   disconnectGateway: () => confirm('Scollegare il telefono Android? Gli SMS non partiranno finché non lo ricolleghi.') && saveGateway('', ''),
   setSmsChannel: (el) => setSmsChannel(el.dataset.arg),

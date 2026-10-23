@@ -1,9 +1,9 @@
 // Offline support: pages and assets are network-first with a cache fallback, so updates arrive at once when online.
 // The API is never cached here: the admin app keeps its own data copy and change queue (see offline.js).
-const CACHE = 'salone-pro-v6';
+const CACHE = 'salone-pro-v7';
 // Admin sections share one page (see vercel.json rewrites): offline they all open the cached "/".
 const SECTIONS = /^\/(agenda|listino|clienti|magazzino|prenotazione-web|privacy|impostazioni)\/?$/;
-const SHELL = ['/', '/base.css', '/common.js', '/offline.js', '/history.js', '/csv.js', '/admin.css', '/js/app.js', '/js/api-sync.js', '/js/novita.js', '/js/agenda.js', '/js/listino.js', '/js/clienti.js', '/js/magazzino.js', '/js/impostazioni.js', '/js/avvio.js', '/vendor/phosphor.css', '/vendor/phosphor.woff2', '/vendor/geist.woff2', '/manifest.webmanifest', '/favicon.svg', '/icons/icon-192.png'];
+const SHELL = ['/', '/base.css', '/theme.js', '/common.js', '/offline.js', '/history.js', '/csv.js', '/admin.css', '/js/app.js', '/js/api-sync.js', '/js/novita.js', '/js/agenda.js', '/js/listino.js', '/js/clienti.js', '/js/magazzino.js', '/js/impostazioni.js', '/js/avvio.js', '/vendor/phosphor.css', '/vendor/phosphor.woff2', '/vendor/geist.woff2', '/manifest.webmanifest', '/favicon.svg', '/icons/icon-192.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

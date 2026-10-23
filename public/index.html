@@ -8,6 +8,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#fdfdfd" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#18181b" media="(prefers-color-scheme: dark)">
+<script src="/theme.js"></script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Salone PRO">
@@ -40,6 +41,11 @@
       <a class="nav-item" href="/impostazioni" data-tab="backup"><i class="ph ph-gear-six" aria-hidden="true"></i>Impostazioni &amp; dati</a>
     </nav>
     <button class="nav-item nav-bottom" data-click="openNews"><i class="ph ph-sparkle" aria-hidden="true"></i>Novità<span class="app-ver num"></span></button>
+    <div class="theme-pick side-theme" role="group" aria-label="Tema">
+        <button data-click="setTheme" data-arg="auto" aria-pressed="false" title="Come il dispositivo"><i class="ph ph-circle-half" aria-hidden="true"></i>Auto</button>
+        <button data-click="setTheme" data-arg="light" aria-pressed="false"><i class="ph ph-sun" aria-hidden="true"></i>Chiaro</button>
+        <button data-click="setTheme" data-arg="dark" aria-pressed="false"><i class="ph ph-moon" aria-hidden="true"></i>Scuro</button>
+      </div>
   </aside>
 
   <main class="main">
@@ -320,6 +326,7 @@
         <div class="panel pad">
           <div class="panel-title"><h3>Notifiche sul telefono</h3><span class="badge" id="push-badge"></span></div>
           <p class="muted">Il telefono ti avvisa anche con l'app chiusa e lo schermo bloccato: nuove prenotazioni online e, ogni mattina, il riepilogo della giornata. Va attivato su ogni telefono o tablet che vuoi far suonare.</p>
+          <div class="row-wrap"><button class="btn btn-ghost btn-sm" data-click="openGuide" data-arg="push"><i class="ph ph-book-open" aria-hidden="true"></i>Guida passo passo</button></div>
           <p class="note" id="push-ios-hint" hidden><i class="ph ph-device-mobile" aria-hidden="true"></i><span>Su iPhone e iPad le notifiche arrivano solo all'app installata: tocca Condividi, poi "Aggiungi alla schermata Home", apri Salone PRO da lì e torna in questa pagina.</span></p>
           <div class="row-wrap">
             <button class="btn btn-primary" id="push-on" data-click="enablePush"><i class="ph ph-bell-ringing" aria-hidden="true"></i>Attiva su questo dispositivo</button>
@@ -339,6 +346,8 @@
         <div class="panel pad">
           <div class="panel-title"><h3>SMS automatici alle clienti</h3><span class="badge" id="sms-badge"></span></div>
           <p class="muted">Partono dal telefono del salone con la sua SIM, quindi non costano nulla oltre al tuo piano: una conferma appena l'appuntamento è preso (anche online) e un promemoria il giorno prima, verso le 8.</p>
+          <div class="row-wrap"><button class="btn btn-ghost btn-sm" data-click="openGuide" data-arg="sms"><i class="ph ph-book-open" aria-hidden="true"></i>Guida passo passo</button></div>
+          <p class="note" id="sms-cron-note" hidden><i class="ph ph-warning" aria-hidden="true"></i><span>Il promemoria del giorno prima non può partire: su Vercel manca la variabile CRON_SECRET. Chi ha installato Salone PRO la aggiunge in Settings, Environment Variables (una frase lunga a caso) e poi rifà il deploy. Le conferme funzionano lo stesso.</span></p>
           <div class="chips chips-free field-gap">
             <label class="chip"><input type="checkbox" id="sms-enabled">SMS automatici attivi</label>
             <label class="chip"><input type="checkbox" id="sms-confirm">Conferma dell'appuntamento</label>
@@ -368,12 +377,7 @@
             <p class="hint">Gli SMS passano dal servizio gratuito di sms-gate.app, che li inoltra al telefono: riceve il numero e il testo del messaggio.</p>
           </div>
           <div id="sms-iphone" hidden>
-            <p class="muted field-gap">L'iPhone non permette alle app di mandare SMS da sole: lo fa un'automazione di Comandi Rapidi, all'ora che scegli. Le conferme partono quindi al giro successivo, non subito.</p>
-            <ol class="steps">
-              <li>Apri <strong>Comandi Rapidi</strong>, scheda <strong>Automazione</strong>, nuova automazione <strong>Ora del giorno</strong> (per esempio alle 9:00, ogni giorno) con <strong>Esegui subito</strong>.</li>
-              <li>Aggiungi <strong>Ottieni contenuti dell'URL</strong> con il link qui sotto, poi <strong>Ottieni valore del dizionario</strong> per la chiave "messages".</li>
-              <li>Aggiungi <strong>Ripeti con ogni elemento</strong> e, dentro: <strong>Invia messaggio</strong> con testo = valore "text" e destinatario = valore "to" (disattiva "Mostra quando viene eseguito"), poi <strong>Ottieni contenuti dell'URL</strong> con il link seguito da <strong>&amp;ack=</strong> e il valore "id".</li>
-            </ol>
+            <p class="muted field-gap">L'iPhone non permette alle app di mandare SMS da sole: lo fa un comando di Comandi Rapidi che parte ogni giorno all'ora che scegli, quindi le conferme non arrivano subito. La guida passo passo spiega come crearlo. Ti serve questo link:</p>
             <div class="link-row">
               <input id="sms-link" readonly aria-label="Link per Comandi Rapidi" data-focus="select">
               <button class="btn btn-primary" data-click="copyLink" data-arg="sms-link"><i class="ph ph-copy" aria-hidden="true"></i>Copia link</button>
@@ -450,6 +454,13 @@
       <a class="nav-item" href="/impostazioni" data-tab="backup"><i class="ph ph-gear-six" aria-hidden="true"></i>Impostazioni &amp; dati</a>
       <button class="nav-item" data-click="openNews"><i class="ph ph-sparkle" aria-hidden="true"></i>Novità<span class="app-ver num"></span></button>
     </nav>
+    <div class="sheet-theme"><span class="label">Tema</span>
+      <div class="theme-pick" role="group" aria-label="Tema">
+        <button data-click="setTheme" data-arg="auto" aria-pressed="false" title="Come il dispositivo"><i class="ph ph-circle-half" aria-hidden="true"></i>Auto</button>
+        <button data-click="setTheme" data-arg="light" aria-pressed="false"><i class="ph ph-sun" aria-hidden="true"></i>Chiaro</button>
+        <button data-click="setTheme" data-arg="dark" aria-pressed="false"><i class="ph ph-moon" aria-hidden="true"></i>Scuro</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -507,6 +518,101 @@
           <li>Conferma con <strong>Installa</strong>: l'app compare nel menu Start o nel Dock.</li>
         </ol>
       </details>
+    </div>
+  </div>
+</div>
+
+<!-- Step-by-step guides opened from Impostazioni (SMS and phone notifications): one section shown at a time -->
+<div class="modal-backdrop" id="guide-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+    <div class="modal-head">
+      <h2 id="guide-title"></h2>
+      <button class="btn-icon" data-click="closeModal" data-arg="guide-modal" aria-label="Chiudi"><i class="ph ph-x" aria-hidden="true"></i></button>
+    </div>
+
+    <div data-guide="sms" data-title="Come attivare gli SMS automatici" hidden>
+      <p class="muted">Gli SMS partono dal telefono del salone, con la sua SIM, come se li scrivessi tu, quindi non paghi nulla oltre al tuo piano. Ti serve un telefono che resti in salone acceso e collegato a internet. Apri la parte che riguarda il tuo.</p>
+      <div class="guide">
+        <details data-os="android">
+          <summary><i class="ph ph-android-logo" aria-hidden="true"></i>Telefono Android (consigliato)</summary>
+          <ol>
+            <li>Sul telefono del salone apri il Play Store, cerca "SMS Gateway for Android" e installala. È gratuita.</li>
+            <li>Apri l'app e, quando te lo chiede, consenti l'invio di SMS.</li>
+            <li>Nella schermata principale accendi "Cloud Server", poi tocca il pulsante "Offline". Dopo qualche secondo diventa "Online".</li>
+            <li>Nella sezione "Cloud Server" compaiono un nome utente e una password: ti servono al passo dopo.</li>
+            <li>Apri Salone PRO, dal telefono o dal computer, e vai in Impostazioni. Nel riquadro "SMS automatici" scegli "Android", scrivi nome utente e password e tocca "Collega".</li>
+            <li>Spunta "SMS automatici attivi" e tocca "Salva SMS".</li>
+            <li>Tocca "Invia una prova al salone". In pochi secondi il numero WhatsApp del salone riceve un SMS di prova e in "Ultimi SMS" compare "Inviato".</li>
+          </ol>
+          <p class="guide-tip">Lascia il telefono in carica e collegato al Wi-Fi. Se Android chiude l'app per risparmiare batteria, gli SMS restano in attesa: nelle impostazioni del telefono apri App, poi SMS Gateway, poi Batteria, e scegli "Senza restrizioni". Il nome della voce cambia un po' da marca a marca.</p>
+        </details>
+        <details data-os="ios">
+          <summary><i class="ph ph-apple-logo" aria-hidden="true"></i>iPhone</summary>
+          <p class="guide-intro">Su iPhone un'app non può mandare SMS da sola. Lo fa Comandi Rapidi, l'app di Apple già presente sul telefono: prepari un comando che prende da Salone PRO i messaggi da spedire e li invia, poi un'automazione lo fa partire ogni giorno all'ora che scegli. Le conferme partono a quell'ora, non nel momento in cui prendi l'appuntamento.</p>
+          <ol>
+            <li>In Salone PRO vai in Impostazioni, riquadro "SMS automatici": scegli "iPhone", spunta "SMS automatici attivi", tocca "Salva SMS" e poi "Copia link". Se lo copi da un altro dispositivo, mandatelo sull'iPhone del salone.</li>
+            <li>Sull'iPhone apri Comandi Rapidi, scheda "Comandi rapidi", tocca "+" e chiama il comando "SMS Salone".</li>
+            <li>Aggiungi l'azione "Ottieni contenuti dell'URL" (la trovi cercando "URL") e al posto dell'indirizzo incolla il link.</li>
+            <li>Aggiungi "Ottieni valore del dizionario" (cerca "dizionario") e come chiave scrivi messages.</li>
+            <li>Aggiungi "Ripeti con ognuno" (cerca "Ripeti"). Dentro il blocco metti, in quest'ordine:
+              <ul>
+                <li>"Ottieni valore del dizionario" con chiave to, preso da "Elemento ripetuto": è il numero della cliente;</li>
+                <li>"Ottieni valore del dizionario" con chiave text, sempre da "Elemento ripetuto": è il testo;</li>
+                <li>"Invia messaggio", con il testo come messaggio e il numero come destinatario. Apri la freccia dell'azione e spegni "Mostra quando viene eseguito";</li>
+                <li>"Ottieni valore del dizionario" con chiave id da "Elemento ripetuto", poi "Ottieni contenuti dell'URL" con il link seguito da &amp;ack= e dal valore id. In questo modo Salone PRO sa che l'SMS è partito e non lo rimanda.</li>
+              </ul>
+            </li>
+            <li>Prova il comando: in Salone PRO tocca "Invia una prova al salone", poi sull'iPhone tocca "SMS Salone". La prima volta l'iPhone chiede il permesso di aprire il link e di mandare messaggi: rispondi "Consenti sempre".</li>
+            <li>Ora fallo partire da solo. Nella scheda "Automazione" tocca "+", scegli "Ora del giorno", per esempio le 9:00 ogni giorno, e l'opzione che lo esegue senza chiedere conferma. Come azione scegli "Esegui comando rapido" e poi "SMS Salone". Se vuoi conferme più veloci, aggiungi altre automazioni uguali in altri orari.</li>
+          </ol>
+        </details>
+      </div>
+      <h3 class="guide-h">Se qualcosa non va</h3>
+      <ul class="guide-list">
+        <li>"Nome utente o password del gateway sbagliati": ricopiali dalla sezione "Cloud Server" dell'app e tocca di nuovo "Collega".</li>
+        <li>"Gateway non raggiungibile", oppure l'SMS non arriva: controlla che il telefono sia acceso e connesso e che l'app dica "Online", poi tocca "Riprova quelli non partiti".</li>
+        <li>Su iPhone gli SMS restano "In attesa" finché il comando non parte. Se vuoi mandarli subito, tocca "SMS Salone" a mano.</li>
+        <li>Il promemoria del giorno prima parte verso le 8, solo per le clienti che hanno un numero e che non hai già avvisato a mano. Se nel riquadro vedi l'avviso su CRON_SECRET, chi ha installato Salone PRO deve aggiungere quella variabile su Vercel.</li>
+      </ul>
+    </div>
+
+    <div data-guide="push" data-title="Come attivare le notifiche sul telefono" hidden>
+      <p class="muted">Le notifiche arrivano anche con Salone PRO chiuso e lo schermo bloccato: una per ogni prenotazione online e un riepilogo ogni mattina. Le attivi una volta sola su ogni telefono, tablet o computer che vuoi far suonare.</p>
+      <div class="guide">
+        <details data-os="android">
+          <summary><i class="ph ph-android-logo" aria-hidden="true"></i>Android</summary>
+          <ol>
+            <li>Apri Salone PRO con Chrome, oppure dall'icona se l'hai installato.</li>
+            <li>Vai in Impostazioni e nel riquadro "Notifiche sul telefono" tocca "Attiva su questo dispositivo". Quando il telefono lo chiede, tocca "Consenti".</li>
+            <li>Tocca "Invia una prova": dopo pochi secondi arriva la notifica.</li>
+          </ol>
+          <p class="guide-tip">Se hai toccato "Blocca" per sbaglio, tocca il lucchetto accanto all'indirizzo in Chrome, apri "Notifiche" e scegli "Consenti". Poi torna in Impostazioni.</p>
+        </details>
+        <details data-os="ios">
+          <summary><i class="ph ph-apple-logo" aria-hidden="true"></i>iPhone e iPad</summary>
+          <ol>
+            <li>Ti servono iOS 16.4 o successivo e Salone PRO sulla schermata Home: in Safari tocca Condividi e poi "Aggiungi alla schermata Home".</li>
+            <li>Apri Salone PRO dall'icona appena aggiunta, non da Safari, e accedi.</li>
+            <li>In Impostazioni tocca "Attiva su questo dispositivo" e poi "Consenti".</li>
+            <li>Tocca "Invia una prova".</li>
+          </ol>
+          <p class="guide-tip">Se le avevi bloccate: apri le Impostazioni dell'iPhone, poi Notifiche, poi Salone PRO, e attiva "Consenti notifiche".</p>
+        </details>
+        <details data-os="desktop">
+          <summary><i class="ph ph-desktop" aria-hidden="true"></i>Computer</summary>
+          <ol>
+            <li>Apri Salone PRO con Chrome o Edge, vai in Impostazioni e clicca "Attiva su questo dispositivo".</li>
+            <li>Nella finestrella vicino all'indirizzo scegli "Consenti", poi clicca "Invia una prova".</li>
+          </ol>
+          <p class="guide-tip">Sul computer le notifiche arrivano finché il browser è aperto, anche se Salone PRO è in un'altra scheda. Su Windows controlla che "Non disturbare" sia spento.</p>
+        </details>
+      </div>
+      <h3 class="guide-h">Se qualcosa non va</h3>
+      <ul class="guide-list">
+        <li>La prova non arriva: controlla che il telefono non sia in "Non disturbare" o in risparmio energetico, poi riprova.</li>
+        <li>Hai cambiato telefono: attiva le notifiche anche sul nuovo. Quello vecchio smette di riceverle da solo.</li>
+        <li>"Cosa ricevere" vale per tutti i dispositivi: se togli il riepilogo del mattino, non arriva più a nessuno.</li>
+      </ul>
     </div>
   </div>
 </div>

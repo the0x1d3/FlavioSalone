@@ -68,7 +68,8 @@ Salone PRO nasce da un gestionale in un singolo file HTML che salvava tutto nel 
 
 **App e offline**
 - Configurazione guidata alla prima installazione: dati del salone, orari, listino e link per le clienti in 4 passi.
-- PWA installabile su tablet, telefono e computer, con tema chiaro e scuro automatico.
+- PWA installabile su tablet, telefono e computer. Tema chiaro, scuro o automatico (segue il dispositivo), da scegliere in fondo al menu e alla pagina di prenotazione.
+- Guide passo passo dentro l'app per attivare SMS automatici e notifiche su Android, iPhone e computer.
 - Senza rete si apre lo stesso: le modifiche restano sul dispositivo e partono da sole al ritorno della connessione.
 
 ## Screenshot

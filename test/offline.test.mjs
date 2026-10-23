@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFileSync } from 'node:fs';
 
-const ctx = vm.createContext({ document: { addEventListener() {} } });
+const ctx = vm.createContext({ document: { addEventListener() {}, documentElement: { dataset: {} }, querySelectorAll: () => [] } });
 for (const f of ['common.js', 'offline.js']) vm.runInContext(readFileSync(new URL(`../public/${f}`, import.meta.url), 'utf8'), ctx);
 const { applyOp, clashes } = vm.runInContext('({ applyOp, clashes })', ctx);
 

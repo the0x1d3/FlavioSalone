@@ -20,6 +20,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#f5f5f6" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#101012" media="(prefers-color-scheme: dark)">
+<script src="/theme.js"></script>
 <meta name="apple-mobile-web-app-title" content="Prenota">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -96,6 +97,11 @@
 
 <footer class="wrap foot">
   <p>Nessun cookie di profilazione. <button data-click="openLegal">Informativa privacy</button></p>
+  <div class="theme-pick" role="group" aria-label="Tema">
+        <button data-click="setTheme" data-arg="auto" aria-pressed="false" title="Come il dispositivo"><i class="ph ph-circle-half" aria-hidden="true"></i>Auto</button>
+        <button data-click="setTheme" data-arg="light" aria-pressed="false"><i class="ph ph-sun" aria-hidden="true"></i>Chiaro</button>
+        <button data-click="setTheme" data-arg="dark" aria-pressed="false"><i class="ph ph-moon" aria-hidden="true"></i>Scuro</button>
+      </div>
 </footer>
 
 <div class="mobile-bar">

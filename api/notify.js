@@ -36,6 +36,7 @@ export default handle(async (req, res) => {
       recent: recent.map((r) => r.data),
       pushKey: (await vapidKeys(sql, origin)).publicKey,
       pushDevices: n,
+      cron: Boolean(process.env.CRON_SECRET), // without it the morning job (reminders, summary) never runs
     });
   }
 
