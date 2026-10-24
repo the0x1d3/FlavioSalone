@@ -383,6 +383,7 @@
               <button class="btn btn-primary" data-click="copyLink" data-arg="sms-link"><i class="ph ph-copy" aria-hidden="true"></i>Copia link</button>
             </div>
             <p class="hint">Il link è segreto: contiene numeri e messaggi delle clienti. "Esci da tutti i dispositivi" lo cambia.</p>
+            <p class="note" id="sms-iphone-seen" hidden><i class="ph ph-clock" aria-hidden="true"></i><span></span></p>
           </div>
           <div class="field field-gap"><label for="sms-tpl-confirm">Testo della conferma</label><textarea id="sms-tpl-confirm" rows="2" maxlength="480"></textarea></div>
           <div class="field field-gap"><label for="sms-tpl-reminder">Testo del promemoria</label><textarea id="sms-tpl-reminder" rows="2" maxlength="480"></textarea>
@@ -548,23 +549,51 @@
         </details>
         <details data-os="ios">
           <summary><i class="ph ph-apple-logo" aria-hidden="true"></i>iPhone</summary>
-          <p class="guide-intro">Su iPhone un'app non può mandare SMS da sola. Lo fa Comandi Rapidi, l'app di Apple già presente sul telefono: prepari un comando che prende da Salone PRO i messaggi da spedire e li invia, poi un'automazione lo fa partire ogni giorno all'ora che scegli. Le conferme partono a quell'ora, non nel momento in cui prendi l'appuntamento.</p>
+          <p class="guide-intro">Su iPhone un'app non può mandare SMS da sola. Lo fa Comandi Rapidi, l'app di Apple già presente sul telefono: prepari una volta sola un comando, "SMS Salone", che prende da Salone PRO i messaggi da spedire e li invia, poi un'automazione lo fa partire ogni giorno all'ora che scegli. Le conferme partono a quell'ora, non nel momento in cui prendi l'appuntamento. Fai tutto sull'iPhone del salone: servono circa 10 minuti.</p>
+          <p class="guide-tip"><strong>Due gesti che servono più volte.</strong> In Comandi Rapidi i valori presi da un'azione precedente sono riquadri blu, detti variabili. Per metterne una in un campo: tocca il campo, poi "Seleziona variabile" sopra la tastiera, poi il riquadro blu che ti serve. Per cambiare una parola blu già scritta in un'azione, tienila premuta e scegli dall'elenco.</p>
+          <p class="guide-part">1. Il link</p>
           <ol>
-            <li>In Salone PRO vai in Impostazioni, riquadro "SMS automatici": scegli "iPhone", spunta "SMS automatici attivi", tocca "Salva SMS" e poi "Copia link". Se lo copi da un altro dispositivo, mandatelo sull'iPhone del salone.</li>
-            <li>Sull'iPhone apri Comandi Rapidi, scheda "Comandi rapidi", tocca "+" e chiama il comando "SMS Salone".</li>
-            <li>Aggiungi l'azione "Ottieni contenuti dell'URL" (la trovi cercando "URL") e al posto dell'indirizzo incolla il link.</li>
-            <li>Aggiungi "Ottieni valore del dizionario" (cerca "dizionario") e come chiave scrivi messages.</li>
-            <li>Aggiungi "Ripeti con ognuno" (cerca "Ripeti"). Dentro il blocco metti, in quest'ordine:
-              <ul>
-                <li>"Ottieni valore del dizionario" con chiave to, preso da "Elemento ripetuto": è il numero della cliente;</li>
-                <li>"Ottieni valore del dizionario" con chiave text, sempre da "Elemento ripetuto": è il testo;</li>
-                <li>"Invia messaggio", con il testo come messaggio e il numero come destinatario. Apri la freccia dell'azione e spegni "Mostra quando viene eseguito";</li>
-                <li>"Ottieni valore del dizionario" con chiave id da "Elemento ripetuto", poi "Ottieni contenuti dell'URL" con il link seguito da &amp;ack= e dal valore id. In questo modo Salone PRO sa che l'SMS è partito e non lo rimanda.</li>
-              </ul>
-            </li>
-            <li>Prova il comando: in Salone PRO tocca "Invia una prova al salone", poi sull'iPhone tocca "SMS Salone". La prima volta l'iPhone chiede il permesso di aprire il link e di mandare messaggi: rispondi "Consenti sempre".</li>
-            <li>Ora fallo partire da solo. Nella scheda "Automazione" tocca "+", scegli "Ora del giorno", per esempio le 9:00 ogni giorno, e l'opzione che lo esegue senza chiedere conferma. Come azione scegli "Esegui comando rapido" e poi "SMS Salone". Se vuoi conferme più veloci, aggiungi altre automazioni uguali in altri orari.</li>
+            <li>Sull'iPhone apri Salone PRO e vai in Impostazioni, riquadro "SMS automatici". Scegli "iPhone", spunta "SMS automatici attivi" e tocca "Salva SMS". Poi tocca "Copia link".</li>
           </ol>
+          <p class="guide-part">2. Il comando</p>
+          <ol start="2">
+            <li>Apri Comandi Rapidi, scheda "Comandi rapidi" in basso, e tocca "+" in alto a destra. Tocca il nome in alto, scegli "Rinomina" e scrivi SMS Salone.</li>
+            <li>Tocca la barra di ricerca in basso, cerca URL e tocca "Ottieni contenuti dell'URL". Nell'azione tieni premuta la parola blu "URL" e scegli "Incolla": compare il link di Salone PRO.</li>
+            <li>Cerca dizionario e tocca "Ottieni valore dizionario". Tocca "Chiave" e scrivi messages, tutto minuscolo. La fine dell'azione deve dire "Contenuti dell'URL".</li>
+            <li>Cerca Ripeti e tocca "Ripeti con ogni". Compare un blocco che va da "Ripeti con ogni elemento" a "Interrompi ripetizione": le azioni del passo dopo vanno tutte dentro, tra queste due righe. Se una finisce fuori, tienila premuta e trascinala dentro.</li>
+            <li>Dentro il blocco aggiungi, in quest'ordine:
+              <ol>
+                <li>"Ottieni valore dizionario", con chiave to. La fine deve dire "Ripeti elemento": se dice altro, tieni premuta quella parola blu e scegli "Ripeti elemento".</li>
+                <li>"Imposta variabile" (cerca variabile). Tocca "Nome variabile" e scrivi Numero.</li>
+                <li>"Ottieni valore dizionario", con chiave text. Anche qui la fine deve dire "Ripeti elemento": all'inizio dice "Numero", quindi tienila premuta e scegli "Ripeti elemento".</li>
+                <li>"Imposta variabile", con nome Testo.</li>
+                <li>"Invia messaggio" (cerca messaggio). Tocca "Messaggio" e scegli Testo nella barra sopra la tastiera; tocca "Destinatari" e scegli Numero. Poi tocca la freccia accanto al nome dell'azione e spegni "Mostra quando viene eseguito", altrimenti l'iPhone aspetta che tu tocchi Invia.</li>
+                <li>"Ottieni valore dizionario", con chiave ack e la fine su "Ripeti elemento", come sopra.</li>
+                <li>"Ottieni contenuti dell'URL". Deve dire "Ottieni contenuti di Valore dizionario": è il link con cui Salone PRO sa che l'SMS è partito e non lo rimanda.</li>
+              </ol>
+            </li>
+            <li>Tocca "Fine" in alto.</li>
+          </ol>
+          <div class="guide-tip"><strong>Come deve risultare il comando, dall'alto in basso:</strong>
+            <ol>
+              <li>Ottieni contenuti dell'URL (il link di Salone PRO)</li>
+              <li>Ottieni valore dizionario: messages</li>
+              <li>Ripeti con ogni elemento, e dentro: valore to, variabile Numero, valore text, variabile Testo, Invia messaggio Testo a Numero, valore ack, Ottieni contenuti dell'URL</li>
+              <li>Interrompi ripetizione</li>
+            </ol>
+          </div>
+          <p class="guide-part">3. La prova</p>
+          <ol start="8">
+            <li>In Salone PRO tocca "Invia una prova al salone". Poi in Comandi Rapidi tocca il riquadro "SMS Salone".</li>
+            <li>La prima volta l'iPhone chiede il permesso di collegarsi a Salone PRO e di inviare messaggi: rispondi "Consenti sempre". In pochi secondi il numero WhatsApp del salone riceve l'SMS di prova; in Salone PRO l'SMS diventa "Inviato" e compare "Ultimo controllo dell'iPhone".</li>
+          </ol>
+          <p class="guide-part">4. L'automazione</p>
+          <ol start="10">
+            <li>In Comandi Rapidi apri la scheda "Automazione" in basso e tocca "+" (o "Crea automazione personale"). Scegli "Ora del giorno".</li>
+            <li>Imposta l'ora, per esempio 9:00, e "Ogni giorno". In fondo scegli "Esegui immediatamente"; se non vuoi un avviso a ogni giro, spegni "Notifica quando viene eseguito". Tocca "Avanti".</li>
+            <li>Nell'elenco tocca "SMS Salone": l'automazione è pronta. Su iPhone con iOS 16 o precedente, apri l'automazione, spegni "Chiedi prima di eseguire" e conferma con "Non chiedere".</li>
+          </ol>
+          <p class="guide-tip">Per conferme più veloci crea altre automazioni uguali in altri orari, per esempio alle 12:00, 15:00 e 18:00. Gli SMS già partiti non vengono mai rimandati.</p>
         </details>
       </div>
       <h3 class="guide-h">Se qualcosa non va</h3>
@@ -572,6 +601,9 @@
         <li>"Nome utente o password del gateway sbagliati": ricopiali dalla sezione "Cloud Server" dell'app e tocca di nuovo "Collega".</li>
         <li>"Gateway non raggiungibile", oppure l'SMS non arriva: controlla che il telefono sia acceso e connesso e che l'app dica "Online", poi tocca "Riprova quelli non partiti".</li>
         <li>Su iPhone gli SMS restano "In attesa" finché il comando non parte. Se vuoi mandarli subito, tocca "SMS Salone" a mano.</li>
+        <li>Nel riquadro c'è scritto "L'iPhone non ha ancora controllato", o l'ultimo controllo è di ieri o prima: l'automazione non è partita. In Comandi Rapidi, scheda "Automazione", controlla che quella di "SMS Salone" sia attiva e impostata su "Esegui immediatamente". Se parte solo quando sblocchi l'iPhone, aggiungi orari in cui il telefono è in uso.</li>
+        <li>Dopo "Esci da tutti i dispositivi" il link cambia e il comando smette di funzionare: copia il link nuovo e incollalo nella prima azione del comando, al posto del vecchio. Basta quello.</li>
+        <li>L'iPhone chiede il permesso di scrivere a un numero nuovo: rispondi "Consenti sempre". Gli SMS rimasti "In attesa" partono al giro successivo.</li>
         <li>Il promemoria del giorno prima parte verso le 8, solo per le clienti che hanno un numero e che non hai già avvisato a mano. Se nel riquadro vedi l'avviso su CRON_SECRET, chi ha installato Salone PRO deve aggiungere quella variabile su Vercel.</li>
       </ul>
     </div>

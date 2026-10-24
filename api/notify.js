@@ -8,7 +8,7 @@ export default handle(async (req, res) => {
   const origin = `https://${req.headers.host}`;
 
   // iPhone Shortcut: GET ?k=... returns the SMS to send (tomorrow's reminders are prepared here too, so it works
-  // even if the daily job did not run); GET ?k=...&ack=ID after each one is sent.
+  // even if the daily job did not run), each with its ready-made `ack` link to open once it is sent.
   if (req.query.k !== undefined) {
     if (!checkLinkToken('sms', req.query.k, await sessionEpoch(sql))) fail(401, 'Link non valido: copialo di nuovo dalle Impostazioni di Salone PRO');
     if (req.query.ack !== undefined) {
@@ -17,9 +17,12 @@ export default handle(async (req, res) => {
       return res.json({ ok: true });
     }
     const config = await loadConfig(sql);
+    await setSecret(sql, { iphoneSeen: new Date().toISOString() }); // the settings panel shows when the iPhone last checked
     if (config.sms?.enabled) await queueReminders(sql, config);
     const msgs = config.sms?.enabled && config.sms?.channel === 'iphone' ? await pendingSms(sql) : [];
-    return res.json({ messages: msgs.map((m) => ({ id: m.id, to: m.to, text: m.text })) });
+    // A full link per message: the Shortcut only opens it, nothing to assemble (16-digit ids are easy to mangle there).
+    const ack = (id) => `${origin}/api/notify?k=${encodeURIComponent(req.query.k)}&ack=${id}`;
+    return res.json({ messages: msgs.map((m) => ({ id: m.id, to: m.to, text: m.text, ack: ack(m.id) })) });
   }
 
   await requireAdmin(req, sql);
@@ -33,6 +36,7 @@ export default handle(async (req, res) => {
     return res.json({
       gateway: Boolean(secret.gateway?.username), // the gateway password never leaves the server
       shortcutUrl: `${origin}/api/notify?k=${linkToken('sms', await sessionEpoch(sql))}`,
+      iphoneSeen: secret.iphoneSeen || null, // last time the Shortcut asked for messages
       recent: recent.map((r) => r.data),
       pushKey: (await vapidKeys(sql, origin)).publicKey,
       pushDevices: n,

@@ -251,7 +251,10 @@ details[open] > summary .folder-caret { transform: rotate(90deg); }
 .guide summary .ph { font-size: 1.25rem; color: var(--accent-text); }
 .guide ol { display: grid; gap: 10px; padding: 0 16px 16px 38px; font-size: .92rem; }
 .guide-intro { padding: 0 16px 12px; font-size: .92rem; color: var(--muted); }
-.guide ol ul { display: grid; gap: 6px; margin-top: 8px; padding-left: 18px; }
+.guide ol ul, .guide ol ol { display: grid; gap: 6px; margin-top: 8px; padding: 0 0 0 18px; }
+.guide ol ol { list-style: lower-alpha; }
+.guide-part { padding: 4px 16px 8px; font-size: .92rem; font-weight: 650; }
+.guide-tip ol { padding: 6px 0 0 20px; font-size: inherit; gap: 4px; }
 .guide-tip { margin: 0 16px 16px; padding: 10px 12px; border-radius: var(--r-control); background: var(--surface-2); font-size: .86rem; }
 .guide-h { margin-top: 22px; font-size: 1rem; }
 .guide-list { display: grid; gap: 8px; margin-top: 10px; padding-left: 20px; font-size: .9rem; }

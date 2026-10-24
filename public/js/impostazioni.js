@@ -327,12 +327,20 @@ async function loadNotify() {
 async function renderNotify() {
   const s = db.config.sms || {}, info = notifyInfo;
   // SMS: badge, gateway, Shortcut link, last messages
-  const ready = s.enabled && (smsChannel === 'iphone' || info?.gateway);
+  const ready = s.enabled && (smsChannel === 'iphone' ? info?.iphoneSeen : info?.gateway);
   $('sms-badge').textContent = !s.enabled ? 'Spenti' : ready ? 'Attivi' : 'Da collegare';
   $('sms-badge').className = 'badge ' + (!s.enabled ? '' : ready ? 'badge-ok' : 'badge-warn');
   $('gw-off').hidden = !info?.gateway;
   $('gw-user').placeholder = info?.gateway ? 'Collegato: scrivi qui per cambiarlo' : 'Es. A1B2C3';
   $('sms-link').value = info?.shortcutUrl || 'Serve la connessione per vedere il link';
+  // iPhone: when the Shortcut last asked for messages, so a missing or stopped automation shows here (it runs daily)
+  const seen = info?.iphoneSeen, late = seen && Date.now() - Date.parse(seen) > 26 * 36e5;
+  $('sms-iphone-seen').hidden = !info;
+  $('sms-iphone-seen').querySelector('i').className = 'ph ' + (seen && !late ? 'ph-clock' : 'ph-warning');
+  $('sms-iphone-seen').querySelector('span').textContent = !seen
+    ? "L'iPhone non ha ancora controllato: crea il comando con la guida passo passo e fallo partire una volta."
+    : late ? `L'iPhone non controlla dal ${shortWhen(seen)}: l'automazione non parte o il link è cambiato. Guarda "Se qualcosa non va" nella guida.`
+    : `Ultimo controllo dell'iPhone: ${shortWhen(seen)}.`;
   const status = { sent: ['Inviato', 'badge-ok'], pending: ['In attesa', 'badge-warn'], failed: ['Non partito', 'badge-danger'] };
   const kind = { confirm: 'Conferma', reminder: 'Promemoria', test: 'Prova' };
   const recent = info?.recent || [];

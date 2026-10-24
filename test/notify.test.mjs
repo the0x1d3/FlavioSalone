@@ -140,13 +140,19 @@ test('iPhone: the Shortcut fetches the messages with its secret link and confirm
   const before = sent.length;
   await admin({ method: 'PUT', body: { col: 'appointments', item: { id: 9201, clientName: 'Gaia Rosa', phone: '3331110006', date: openDay, time: '18:00', services: ['Taglio'] } } });
   assert.equal(sent.length, before, 'iPhone mode: nothing goes to the Android gateway');
-  const url = new URL((await call(notify, { cookie })).body.shortcutUrl);
+  const panel = (await call(notify, { cookie })).body, url = new URL(panel.shortcutUrl);
   assert.equal(url.origin, 'https://salone.test');
+  assert.equal(panel.iphoneSeen, null, 'the iPhone has not checked yet');
   assert.equal((await call(notify, { query: { k: 'sbagliato' } })).status, 401);
   const poll = await call(notify, { query: { k: url.searchParams.get('k') } });
   const m = poll.body.messages.find((x) => x.to === '+393331110006');
   assert.ok(m && /Gaia/.test(m.text));
-  await call(notify, { query: { k: url.searchParams.get('k'), ack: String(m.id) } });
+  assert.ok(Date.now() - Date.parse((await call(notify, { cookie })).body.iphoneSeen) < 60000, 'the panel sees the check');
+  const ack = new URL(m.ack); // the Shortcut opens this link as it is
+  assert.equal(ack.origin + ack.pathname, 'https://salone.test/api/notify');
+  assert.equal(ack.searchParams.get('k'), url.searchParams.get('k'));
+  assert.equal(ack.searchParams.get('ack'), String(m.id));
+  await call(notify, { query: Object.fromEntries(ack.searchParams) });
   assert.ok(!(await call(notify, { query: { k: url.searchParams.get('k') } })).body.messages.some((x) => x.id === m.id), 'confirmed: not sent again');
   assert.ok((await admin({})).body.appointments.find((a) => a.id === 9201).smsConfirmAt);
 });

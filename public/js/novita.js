@@ -1,6 +1,10 @@
 // ---------- Novità ----------
 // Newest first. Add an entry at every update: it pops up once on each device, then stays under "Novità".
 const NEWS = [
+  { v: '1.14', date: '24 ottobre 2026', title: 'SMS da iPhone più semplici da attivare', items: [
+    ['ph-apple-logo', 'La guida per gli SMS da iPhone è stata riscritta: un passaggio alla volta, con i nomi esatti di Comandi Rapidi, come si inseriscono le variabili e come deve risultare il comando alla fine.'],
+    ['ph-clock', "Nel riquadro SMS automatici vedi quando l'iPhone ha controllato l'ultima volta, e un avviso se non lo fa da più di un giorno. Se hai già creato il comando con la guida di prima, funziona ancora."],
+  ] },
   { v: '1.13', date: '23 ottobre 2026', title: 'Tema chiaro o scuro e guide passo passo', items: [
     ['ph-circle-half', 'Scegli tu il tema: Auto segue il telefono, oppure Chiaro o Scuro. Il selettore è in fondo al menu (su telefono in "Altro") e in fondo alla pagina di prenotazione. La scelta resta su quel dispositivo.'],
     ['ph-book-open', 'In Impostazioni, accanto a SMS automatici e Notifiche sul telefono, trovi "Guida passo passo": spiega cosa toccare su Android, iPhone e computer e cosa fare se qualcosa non va.'],
