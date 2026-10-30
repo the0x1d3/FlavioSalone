@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Salone Pro, brochure</title>
+<link rel="stylesheet" href="../../public/vendor/phosphor.css">
+<style>
+@font-face { font-family: 'Geist'; src: url('../../public/vendor/geist.woff2') format('woff2'); font-weight: 100 900; }
+@page { size: A4; margin: 0; }
+:root {
+  --text: #18181b; --muted: #5f5f67; --border: #e4e4e7; --bg: #f5f5f6;
+  --accent: #b02a5b; --accent-dark: #8f1d47; --accent-soft: #fbe9f0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font-family: 'Geist', sans-serif; color: var(--text); font-size: 10.2pt; line-height: 1.5; }
+.page { width: 210mm; height: 297mm; position: relative; overflow: hidden; break-after: page; padding: 18mm 18mm 0; display: flex; flex-direction: column; }
+.page:last-child { break-after: auto; }
+.foot { margin-top: auto; height: 15mm; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); font-size: 8pt; color: var(--muted); }
+.kicker { font-size: 8.5pt; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 3mm; }
+h2 { font-size: 25pt; line-height: 1.12; letter-spacing: -.02em; font-weight: 700; margin-bottom: 4mm; }
+h3 { font-size: 11.5pt; line-height: 1.3; font-weight: 650; margin-bottom: 1.5mm; }
+.lead { font-size: 11.5pt; line-height: 1.55; color: #3f3f46; max-width: 150mm; }
+p.muted, .muted { color: var(--muted); }
+.shot { border: 1px solid var(--border); border-radius: 3mm; overflow: hidden; box-shadow: 0 1mm 5mm rgb(24 24 27 / .08); background: #fff; }
+.shot img { display: block; width: 100%; }
+.caption { font-size: 8.5pt; color: var(--muted); margin-top: 2mm; }
+.chip { width: 9mm; height: 9mm; border-radius: 2.5mm; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-size: 14pt; margin-bottom: 3mm; }
+.mark { width: 12mm; height: 12mm; flex: none; }
+
+/* Copertina */
+.cover { background: #efeff1; padding: 0; }
+.cover .top { padding: 20mm 18mm 0; }
+.brand { display: flex; align-items: center; gap: 3.5mm; font-weight: 650; font-size: 12pt; }
+.brand small { display: block; font-weight: 400; font-size: 9pt; color: var(--muted); }
+.cover h1 { font-size: 60pt; line-height: 1; letter-spacing: -.035em; font-weight: 750; margin-top: 30mm; }
+.cover .claim { font-size: 24pt; line-height: 1.2; letter-spacing: -.015em; font-weight: 600; color: var(--accent); margin-top: 4mm; }
+.cover .lead { margin-top: 9mm; font-size: 13pt; max-width: 135mm; }
+.cover .hero { margin-top: auto; width: 210mm; display: block; }
+
+/* Vantaggi */
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; margin-top: 8mm; }
+.card { border: 1px solid var(--border); border-radius: 3mm; padding: 5.5mm; background: #fff; }
+.card p { color: var(--muted); font-size: 9.8pt; }
+.numbers { margin-top: 8mm; background: var(--accent); color: #fff; border-radius: 3mm; padding: 6mm 7mm; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; }
+.numbers b { display: block; font-size: 22pt; line-height: 1.1; letter-spacing: -.02em; font-weight: 700; }
+.numbers span { font-size: 9pt; line-height: 1.4; opacity: .92; display: block; margin-top: 1.5mm; }
+
+/* Agenda e clienti */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm 8mm; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm 6mm; }
+.point h3 { display: flex; align-items: center; gap: 2mm; }
+.point h3 i { color: var(--accent); font-size: 13pt; }
+.point p { color: var(--muted); font-size: 9.6pt; }
+
+/* Prenotazione */
+.split { display: grid; grid-template-columns: 64mm 1fr; gap: 10mm; align-items: start; margin-top: 2mm; }
+.phone { border-radius: 9mm; padding: 2.2mm; background: #18181b; box-shadow: 0 2mm 8mm rgb(24 24 27 / .2); }
+.phone img { display: block; width: 100%; border-radius: 7mm; }
+.checks { list-style: none; margin-top: 6mm; display: grid; gap: 4mm; }
+.checks li { display: grid; grid-template-columns: 6mm 1fr; font-size: 10pt; }
+.checks i { color: var(--accent); font-size: 12pt; line-height: 1.3; }
+.band { margin-top: 8mm; background: var(--bg); border-radius: 3mm; padding: 6mm; }
+.band .grid3 { margin-top: 4mm; }
+.small { font-size: 8.5pt; }
+
+/* Come si parte */
+.start { display: grid; grid-template-columns: 80mm 1fr; gap: 10mm; align-items: center; margin-top: 8mm; }
+.start .shot { border: 0; border-radius: 4mm; }
+.steps { display: grid; gap: 6mm; }
+.step { display: grid; grid-template-columns: 11mm 1fr; }
+.step .n { width: 8mm; height: 8mm; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 10pt; }
+.step p { color: var(--muted); font-size: 9.8pt; }
+.pills { display: flex; flex-wrap: wrap; gap: 2.5mm; margin-top: 8mm; }
+.pills span { display: inline-flex; align-items: center; gap: 2mm; background: #fff; border: 1px solid var(--border); border-radius: 99px; padding: 1.8mm 4mm; font-size: 10pt; font-weight: 550; }
+.pills i { color: var(--accent); font-size: 12pt; }
+.closing { margin-top: auto; margin-left: -18mm; margin-right: -18mm; background: var(--accent); color: #fff; padding: 12mm 18mm; display: flex; align-items: center; gap: 6mm; }
+.closing b { font-size: 24pt; letter-spacing: -.02em; display: block; line-height: 1.1; }
+.closing span { font-size: 13pt; opacity: .92; }
+</style>
+</head>
+<body>
+
+<!-- 1. Copertina -->
+<section class="page cover">
+  <div class="top">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b02a5b"/><g transform="translate(12.16 12.16) scale(0.155)"><path d="M236.52,187.09l-143-97.87a36,36,0,1,0-14.38,17.27l21.39,21.69L79.15,149.54l0,0a35.91,35.91,0,1,0,14.38,17.27l26.91-18.41L170,198.64a32.26,32.26,0,0,0,22.7,9.37,31.52,31.52,0,0,0,4.11-.27l.28,0,36.27-6.11a8,8,0,0,0,3.19-14.5Zm-162.38-97A20,20,0,1,1,80,76,20,20,0,0,1,74.14,90.13Zm0,104A20,20,0,1,1,80,180,20,20,0,0,1,74.14,194.15Zm61-101.5L169.94,57.4a32.19,32.19,0,0,1,26.84-9.14l.28,0,36,6.07a8.21,8.21,0,0,1,6.09,4.42,8,8,0,0,1-2.67,10.12l-69.93,47.85a4,4,0,0,1-4.51,0l-26.31-18A4,4,0,0,1,135.18,92.65Z" fill="#fdfdfd"/></g></svg>
+      <div>Salone Pro<small>Gestionale per parrucchieri</small></div>
+    </div>
+    <h1>Salone Pro</h1>
+    <p class="claim">Il tuo salone in un click</p>
+    <p class="lead">Agenda, schede clienti e prenotazioni online in un'unica app. Funziona su tablet, telefono e computer, anche quando manca internet.</p>
+    <div class="pills">
+      <span><i class="ph ph-calendar-blank"></i>Agenda</span>
+      <span><i class="ph ph-users"></i>Schede clienti</span>
+      <span><i class="ph ph-globe-simple"></i>Prenotazioni online</span>
+      <span><i class="ph ph-chat-text"></i>SMS e WhatsApp</span>
+      <span><i class="ph ph-wifi-slash"></i>Funziona offline</span>
+    </div>
+  </div>
+  <img class="hero" src="../screenshots/hero.png" alt="">
+</section>
+
+<!-- 2. Vantaggi -->
+<section class="page">
+  <p class="kicker">I vantaggi</p>
+  <h2>Cosa cambia nel lavoro<br>di tutti i giorni</h2>
+  <p class="lead">Salone Pro raccoglie in un posto solo quello che oggi è sparso tra l'agenda di carta, la rubrica del telefono e le chat di WhatsApp. La mattina lo apri e vedi subito com'è la giornata.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="chip"><i class="ph ph-globe-simple"></i></div>
+      <h3>Le clienti prenotano da sole</h3>
+      <p>Dal link del salone scelgono servizi, giorno e orario, anche la sera o nei giorni di chiusura. Vedono solo gli orari liberi, calcolati sulla durata dei servizi.</p>
+    </div>
+    <div class="card">
+      <div class="chip"><i class="ph ph-bell-ringing"></i></div>
+      <h3>Meno appuntamenti dimenticati</h3>
+      <p>Il giorno prima la cliente riceve un SMS di promemoria dal numero del salone. Su WhatsApp il messaggio di conferma è già scritto e lo mandi con un tocco.</p>
+    </div>
+    <div class="card">
+      <div class="chip"><i class="ph ph-calendar-check"></i></div>
+      <h3>La giornata in una schermata</h3>
+      <p>Appuntamenti, incasso previsto, chi è in poltrona e chi arriva dopo. Nella stessa pagina trovi le clienti da richiamare e i prodotti da riordinare.</p>
+    </div>
+    <div class="card">
+      <div class="chip"><i class="ph ph-palette"></i></div>
+      <h3>Ogni cliente ha la sua scheda</h3>
+      <p>Formule colore, allergie, note, foto prima e dopo e storico delle visite. Quando torna, sai già cosa le avevi fatto l'ultima volta.</p>
+    </div>
+    <div class="card">
+      <div class="chip"><i class="ph ph-wifi-slash"></i></div>
+      <h3>Lavora anche senza internet</h3>
+      <p>Se la connessione cade, l'app si apre lo stesso. Le modifiche restano sul dispositivo e partono da sole quando la rete torna.</p>
+    </div>
+    <div class="card">
+      <div class="chip"><i class="ph ph-magic-wand"></i></div>
+      <h3>Pronto in pochi minuti</h3>
+      <p>Una configurazione guidata ti chiede i dati del salone, gli orari e il listino. Poi lo installi come un'app su tablet, telefono e computer.</p>
+    </div>
+  </div>
+
+  <div class="numbers">
+    <div><b>4 passi</b><span>per configurare il salone la prima volta</span></div>
+    <div><b>20 secondi</b><span>al massimo per l'avviso di una nuova prenotazione online, con il gestionale aperto</span></div>
+    <div><b>1 giorno</b><span>prima dell'appuntamento la cliente riceve l'SMS di promemoria</span></div>
+  </div>
+
+  <div class="foot"><span>Salone Pro · Il tuo salone in un click</span><span>2</span></div>
+</section>
+
+<!-- 3. Agenda -->
+<section class="page">
+  <p class="kicker">Agenda</p>
+  <h2>Chi arriva, a che ora<br>e quanto incassi</h2>
+  <p class="lead">L'agenda si apre sul riepilogo di oggi: numero di appuntamenti, incasso previsto, chi è in poltrona e tra quanto arriva la prossima cliente. Con un tocco passi alla settimana o al mese, con gli appuntamenti e l'incasso del periodo.</p>
+
+  <div class="shot" style="margin-top:8mm"><img src="../screenshots/settimana.png" alt=""></div>
+  <p class="caption">La vista settimana: per ogni giorno, il numero di appuntamenti e l'incasso.</p>
+
+  <div class="grid2" style="margin-top:8mm; gap:5mm">
+    <div class="point card">
+      <h3><i class="ph ph-clock"></i>Durate e sovrapposizioni</h3>
+      <p>Ogni servizio ha la sua durata, quindi l'ora di fine si calcola da sola. Se due appuntamenti si accavallano, l'app te lo segnala.</p>
+    </div>
+    <div class="point card">
+      <h3><i class="ph ph-coffee"></i>Pause, ferie e festivi</h3>
+      <p>Li vedi in agenda e sono bloccati anche sulla pagina di prenotazione, così nessuno prenota quando il salone è chiuso.</p>
+    </div>
+    <div class="point card">
+      <h3><i class="ph ph-bell"></i>Promemoria da mandare</h3>
+      <p>Un riquadro elenca le clienti di oggi, domani e dopodomani ancora da avvisare. Dopo il messaggio le segni come avvisate.</p>
+    </div>
+    <div class="point card">
+      <h3><i class="ph ph-calendar-plus"></i>Sul calendario del telefono</h3>
+      <p>Con un link privato gli appuntamenti compaiono anche in Google Calendar o in un altro calendario che legge il formato iCalendar.</p>
+    </div>
+  </div>
+
+  <div class="foot"><span>Salone Pro · Il tuo salone in un click</span><span>3</span></div>
+</section>
+
+<!-- 4. Clienti, listino e magazzino -->
+<section class="page">
+  <p class="kicker">Clienti, listino e magazzino</p>
+  <h2>Ogni cliente con la sua storia</h2>
+  <p class="lead">Nella scheda annoti formule colore, note e allergie. Per le allergie, che sono dati sulla salute, l'app registra il consenso previsto dall'articolo 9 del GDPR. La scheda mostra anche quanto ha speso la cliente e tutte le sue visite.</p>
+
+  <div class="shot" style="margin-top:8mm"><img src="img/clienti.png" alt=""></div>
+  <p class="caption">Le schede clienti, con la formula colore e la data del consenso privacy.</p>
+
+  <div class="grid3" style="margin-top:9mm">
+    <div class="point">
+      <h3><i class="ph ph-images"></i>Foto prima e dopo</h3>
+      <p>Aggiungi alla scheda le foto del prima e del dopo o del colore. L'app le rimpicciolisce sul dispositivo, circa 50 KB l'una, quindi non pesano.</p>
+    </div>
+    <div class="point">
+      <h3><i class="ph ph-phone"></i>Clienti da richiamare</h3>
+      <p>La lista mostra chi non viene da qualche settimana e non ha appuntamenti in programma. Per ognuna c'è già un messaggio WhatsApp da mandare.</p>
+    </div>
+    <div class="point">
+      <h3><i class="ph ph-file-csv"></i>Rubrica da Excel</h3>
+      <p>Se hai le clienti in un file Excel o nei contatti Google, le importi in CSV. Chi è già presente viene aggiornato, quindi non si creano doppioni.</p>
+    </div>
+    <div class="point">
+      <h3><i class="ph ph-folder"></i>Listino a cartelle</h3>
+      <p>Organizzi i servizi in cartelle come Piega, Taglio e Colore. Quando cambi un prezzo o una durata, la pagina di prenotazione si aggiorna subito.</p>
+    </div>
+    <div class="point">
+      <h3><i class="ph ph-package"></i>Magazzino</h3>
+      <p>Per ogni prodotto imposti una scorta minima. Quando ci scendi sotto, l'app lo mette tra i prodotti da riordinare.</p>
+    </div>
+    <div class="point">
+      <h3><i class="ph ph-signature"></i>Consensi privacy</h3>
+      <p>Ogni scheda riporta la data del consenso privacy. Per chi firma in salone puoi stampare il modulo e poi registrare il consenso con un tocco.</p>
+    </div>
+  </div>
+
+  <div class="foot"><span>Salone Pro · Il tuo salone in un click</span><span>4</span></div>
+</section>
+
+<!-- 5. Prenotazione online e messaggi -->
+<section class="page">
+  <p class="kicker">Prenotazione online</p>
+  <h2>Le clienti prenotano<br>anche a salone chiuso</h2>
+
+  <div class="split">
+    <div class="phone"><img src="../screenshots/mobile-prenota.png" alt=""></div>
+    <div>
+      <p class="lead">Condividi il link del salone con le clienti, per esempio su WhatsApp o sui tuoi profili social. Dal telefono scelgono i servizi, il giorno e l'orario.</p>
+      <ul class="checks">
+        <li><i class="ph ph-check-circle"></i><span>Gli orari occupati sono bloccati in base alla durata dei servizi scelti, e due clienti non possono prendere lo stesso orario.</span></li>
+        <li><i class="ph ph-check-circle"></i><span>La prenotazione entra in agenda con l'etichetta Web. Se il gestionale è aperto, entro 20 secondi senti un bip.</span></li>
+        <li><i class="ph ph-check-circle"></i><span>Giorni di chiusura, orari, pausa pranzo e intervallo tra un orario e l'altro li decidi tu.</span></li>
+        <li><i class="ph ph-check-circle"></i><span>Dopo la conferma la cliente aggiunge l'appuntamento al suo calendario (Google, iPhone, Samsung o Outlook), con un promemoria due ore prima.</span></li>
+        <li><i class="ph ph-check-circle"></i><span>Chi preferisce manda la richiesta su WhatsApp: incolli il messaggio nel gestionale e l'appuntamento entra in agenda.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="band">
+    <p class="kicker" style="margin:0">Messaggi e avvisi</p>
+    <div class="grid3">
+      <div class="point">
+        <h3><i class="ph ph-chat-text"></i>SMS automatici</h3>
+        <p>Alla cliente arrivano un SMS di conferma quando fissi l'appuntamento e un promemoria il giorno prima. Partono dal telefono del salone, con la sua SIM, e i testi li scrivi tu.</p>
+      </div>
+      <div class="point">
+        <h3><i class="ph ph-whatsapp-logo"></i>WhatsApp</h3>
+        <p>Conferme, promemoria e messaggi liberi si aprono nel tuo WhatsApp con il testo già scritto. Non serve nessun servizio a pagamento.</p>
+      </div>
+      <div class="point">
+        <h3><i class="ph ph-bell-ringing"></i>Notifiche al salone</h3>
+        <p>Sul telefono del salone arrivano le nuove prenotazioni online e, al mattino, il riepilogo della giornata, anche ad app chiusa.</p>
+      </div>
+    </div>
+    <p class="muted small" style="margin-top:4mm">Gli SMS funzionano con Android e con iPhone. Su iPhone partono una volta al giorno, all'ora che scegli.</p>
+  </div>
+
+  <div class="foot"><span>Salone Pro · Il tuo salone in un click</span><span>5</span></div>
+</section>
+
+<!-- 6. Come si parte -->
+<section class="page">
+  <p class="kicker">Come si parte</p>
+  <h2>Quattro passi per cominciare</h2>
+  <p class="lead">Al primo accesso una configurazione guidata ti accompagna passo per passo. Puoi anche saltarla e riprenderla quando vuoi dalle impostazioni.</p>
+
+  <div class="start">
+    <div class="shot"><img src="img/onboarding.png" alt=""></div>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div><h3>Il tuo salone</h3><p>Nome, titolare, numero WhatsApp e indirizzo.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h3>Gli orari</h3><p>Apertura, pausa pranzo, giorni di chiusura e ogni quanto proporre gli orari online.</p></div></div>
+      <div class="step"><div class="n">3</div><div><h3>Il listino</h3><p>Cartelle, servizi, prezzi e durate, che puoi cambiare in qualsiasi momento.</p></div></div>
+      <div class="step"><div class="n">4</div><div><h3>Tutto pronto</h3><p>Ricevi il link da condividere con le clienti, anche su WhatsApp.</p></div></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:12mm; gap:8mm">
+    <div class="card">
+      <div class="chip"><i class="ph ph-devices"></i></div>
+      <h3>Su tutti i tuoi dispositivi</h3>
+      <p>Salone Pro si installa dal browser come un'app su tablet, telefono e computer, senza passare dagli store. Il tema può essere chiaro, scuro o seguire quello del dispositivo. Dentro l'app trovi le guide passo passo per attivare SMS e notifiche.</p>
+    </div>
+    <div class="card">
+      <div class="chip"><i class="ph ph-shield-check"></i></div>
+      <h3>I dati del salone al sicuro</h3>
+      <p>Il gestionale è protetto da password. I dati stanno in un database online a Francoforte, quindi restano nell'Unione Europea. L'informativa privacy viene generata dai dati del salone, e quando vuoi scarichi una copia di backup di tutto.</p>
+    </div>
+  </div>
+
+  <div class="closing">
+    <svg class="mark" style="width:16mm;height:16mm" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#fdfdfd"/><g transform="translate(12.16 12.16) scale(0.155)"><path d="M236.52,187.09l-143-97.87a36,36,0,1,0-14.38,17.27l21.39,21.69L79.15,149.54l0,0a35.91,35.91,0,1,0,14.38,17.27l26.91-18.41L170,198.64a32.26,32.26,0,0,0,22.7,9.37,31.52,31.52,0,0,0,4.11-.27l.28,0,36.27-6.11a8,8,0,0,0,3.19-14.5Zm-162.38-97A20,20,0,1,1,80,76,20,20,0,0,1,74.14,90.13Zm0,104A20,20,0,1,1,80,180,20,20,0,0,1,74.14,194.15Zm61-101.5L169.94,57.4a32.19,32.19,0,0,1,26.84-9.14l.28,0,36,6.07a8.21,8.21,0,0,1,6.09,4.42,8,8,0,0,1-2.67,10.12l-69.93,47.85a4,4,0,0,1-4.51,0l-26.31-18A4,4,0,0,1,135.18,92.65Z" fill="#b02a5b"/></g></svg>
+    <div><b>Salone Pro</b><span>Il tuo salone in un click</span></div>
+  </div>
+</section>
+
+</body>
+</html>
