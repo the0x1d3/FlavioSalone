@@ -2,7 +2,7 @@
 
 // ---------- Prenotazione web ----------
 function renderWebLink() {
-  const link = location.origin + '/prenota';
+  const link = location.origin + bookingPath();
   $('public-link').value = link;
   $('share-wa').href = 'https://wa.me/?text=' + encodeURIComponent(`Prenota il tuo appuntamento da ${db.config.salonName}: ${link}`);
 }
@@ -16,9 +16,9 @@ function copyLink(id = 'public-link') {
 // ---------- Calendario del telefono ----------
 // The link carries a secret token because calendar apps cannot log in; it is fetched only when Impostazioni opens.
 async function loadCalendarLink() {
-  if (!loaded) return; // opened straight on /impostazioni: reload() calls it after login
+  if (!loaded || db.account?.role !== 'owner') return; // opened straight on /impostazioni: reload() calls it after login
   try {
-    const link = `${location.origin}/api/calendar?k=${(await api('GET', '/api/data?calendar')).token}`;
+    const link = (await api('GET', '/api/data?calendar')).url;
     $('cal-link').value = link;
     $('cal-google').href = 'https://calendar.google.com/calendar/render?cid=' + encodeURIComponent(link.replace('https:', 'webcal:'));
   } catch (e) {
@@ -104,7 +104,8 @@ function saveConfig() {
 
 // ---------- Configurazione guidata (prima installazione) ----------
 // Shown once per salon (flag saved in config), while the salon still has the default name.
-const needsOnboarding = () => !db.config.onboarded && db.config.salonName === 'Il Mio Salone';
+// A salon made with "Crea il tuo salone" already has its name, so the sign-up marks it `onboarded: false`.
+const needsOnboarding = () => db.config.onboarded === false || (!db.config.onboarded && db.config.salonName === 'Il Mio Salone');
 const OB_LAST = 4;
 let obStep = 0;
 
@@ -314,7 +315,7 @@ function loadNotifyForm() {
 }
 
 async function loadNotify() {
-  if (!loaded) return; // opened straight on /impostazioni: reload() calls it after login
+  if (!loaded || db.account?.role !== 'owner') return; // opened straight on /impostazioni: reload() calls it after login
   try {
     notifyInfo = await api('GET', '/api/notify');
   } catch (e) {
@@ -467,8 +468,85 @@ function retrySms() {
 }
 
 // ---------- Actions (data-click & co. in index.html and in the templates above, see common.js) ----------
+// ---------- Account, collaborators, salons ----------
+function renderAccount() {
+  const a = db.account;
+  if (!a) return; // offline copy saved before accounts existed
+  document.body.dataset.role = a.role; // staff: the owner's settings are hidden (admin.css)
+  if (a.platformAdmin) document.body.dataset.platform = ''; else delete document.body.dataset.platform;
+  const plan = a.status === 'trial' ? ` Prova gratuita fino al ${fmtDate(a.trialEnd)}.` : a.status === 'active' ? ' Abbonamento attivo.' : '';
+  $('account-info').textContent = `${a.email ? `${a.name} (${a.email})` : 'Password del salone'}, ${a.role === 'owner' ? 'titolare' : 'collaboratore'}.${plan}`;
+}
+
+const netMsg = (e, what) => (isNetwork(e) ? `Serve la connessione per ${what}` : e.message);
+async function loadTeam() {
+  if (!loaded || db.account?.role !== 'owner') return;
+  try {
+    const { members } = await api('GET', '/api/team');
+    $('team-list').innerHTML = members.map((m) => `
+      <div class="err-row">
+        <i class="ph ${m.role === 'owner' ? 'ph-identification-card' : 'ph-users'}" aria-hidden="true"></i>
+        <div><div class="err-head"><strong>${esc(m.name)}</strong><span class="muted small">${m.role === 'owner' ? 'Titolare' : 'Collaboratore'}</span></div><span>${esc(m.email)}</span></div>
+        ${m.role === 'owner' ? '' : `<button class="btn btn-ghost btn-sm" data-click="removeMember" data-arg="${m.id}" aria-label="Togli ${esc(m.name)}"><i class="ph ph-trash" aria-hidden="true"></i></button>`}
+      </div>`).join('') || '<p class="muted small">Ancora nessun collaboratore.</p>';
+  } catch (e) {
+    $('team-list').innerHTML = `<p class="muted small">${esc(netMsg(e, 'vedere i collaboratori'))}</p>`;
+  }
+}
+async function addMember(e) {
+  e.preventDefault();
+  const btn = e.submitter;
+  btn.disabled = true;
+  try {
+    await api('POST', '/api/team', { name: $('tm-name').value, email: $('tm-email').value, password: $('tm-pw').value });
+    ['tm-name', 'tm-email', 'tm-pw'].forEach((id) => { $(id).value = ''; });
+    toast('Collaboratore aggiunto: comunicagli email e password');
+    loadTeam();
+  } catch (err) {
+    toast(netMsg(err, 'aggiungere un collaboratore'), 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+function removeMember(id) {
+  if (!confirm('Togliere questo collaboratore? Esce subito da tutti i dispositivi.')) return;
+  api('DELETE', `/api/team?id=${id}`).then(() => { toast('Collaboratore tolto'); loadTeam(); })
+    .catch((e) => toast(netMsg(e, 'togliere un collaboratore'), 'error'));
+}
+
+// Whoever runs the service (PLATFORM_ADMINS): payments by hand, so a salon is set to active when it pays.
+const SALON_STATUS = { trial: 'In prova', active: 'Attivo', suspended: 'Sospeso' };
+async function loadSalons() {
+  if (!loaded || !db.account?.platformAdmin) return;
+  try {
+    const { salons } = await api('GET', '/api/admin');
+    $('salons-list').innerHTML = salons.map((s) => `
+      <div class="err-row salon-row">
+        <i class="ph ph-scissors" aria-hidden="true"></i>
+        <div><div class="err-head"><strong>${esc(s.name || s.slug)}</strong><span class="muted small">${s.id === 1 ? '/prenota' : '/prenota/' + esc(s.slug)}</span></div>
+          <span class="muted small">${esc(s.owner || 'Password del salone')}, ${s.appointments} appuntamenti, ${s.accounts} account</span>
+          <div class="row-wrap">
+            <select id="sl-status-${s.id}" aria-label="Stato di ${esc(s.name || s.slug)}">${Object.entries(SALON_STATUS).map(([k, v]) => `<option value="${k}"${k === s.status ? ' selected' : ''}>${v}</option>`).join('')}</select>
+            <input type="date" id="sl-trial-${s.id}" aria-label="Prova fino al" value="${esc(s.trialEnd || '')}">
+            <button class="btn btn-outline btn-sm" data-click="saveSalon" data-arg="${s.id}"><i class="ph ph-floppy-disk" aria-hidden="true"></i>Salva</button>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch (e) {
+    $('salons-list').innerHTML = `<p class="muted small">${esc(netMsg(e, 'vedere i saloni'))}</p>`;
+  }
+}
+function saveSalon(id) {
+  const status = $('sl-status-' + id).value, trialEnd = $('sl-trial-' + id).value || null;
+  if (status === 'trial' && !trialEnd) return toast('Per la prova serve la data di fine', 'error');
+  api('POST', '/api/admin', { id: Number(id), status, trialEnd }).then(() => { toast('Salone aggiornato'); loadSalons(); })
+    .catch((e) => toast(netMsg(e, 'aggiornare il salone'), 'error'));
+}
+
 Object.assign(actions.click, {
   signClientGdprInSalon, printPaperGdprForm, saveConfig, openOnboarding, saveClosures, exportBackup, installApp, openInstallGuide, dismissInstall,
+  removeMember: (el) => removeMember(el.dataset.arg),
+  saveSalon: (el) => saveSalon(el.dataset.arg),
   enablePush, disablePush, testPush, saveSms, testSms, retrySms,
   openGuide: (el) => openGuide(el.dataset.arg),
   saveGateway: () => saveGateway(),
@@ -482,3 +560,4 @@ Object.assign(actions.click, {
 });
 actions.change.importBackup = (el, e) => importBackup(e);
 actions.change.saveNotifPrefs = saveNotifPrefs;
+actions.submit.addMember = (el, e) => addMember(e);

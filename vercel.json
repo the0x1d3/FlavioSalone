@@ -5,7 +5,8 @@
   "regions": ["fra1"],
   "crons": [{ "path": "/api/cron", "schedule": "0 6 * * *" }],
   "rewrites": [
-    { "source": "/:section(agenda|listino|clienti|magazzino|prenotazione-web|privacy|impostazioni)", "destination": "/" }
+    { "source": "/:section(agenda|listino|clienti|magazzino|prenotazione-web|privacy|impostazioni)", "destination": "/" },
+    { "source": "/prenota/:salon([a-z0-9-]+)", "destination": "/prenota" }
   ],
   "headers": [
     {

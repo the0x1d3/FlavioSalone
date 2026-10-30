@@ -395,3 +395,7 @@ details[open] > summary .folder-caret { transform: rotate(90deg); }
   .phone-frame { max-width: none; }
   .phone-frame iframe { height: 640px; border-radius: var(--r-surface); }
 }
+
+/* Collaborators do not see the owner's settings; the salons panel is only for whoever runs the service. */
+body[data-role="staff"] .owner-only, body:not([data-platform]) .platform-only { display: none !important; }
+.salon-row select, .salon-row input { width: auto; }

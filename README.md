@@ -31,7 +31,8 @@ Salone PRO nasce da un gestionale in un singolo file HTML che salvava tutto nel 
 | `/` | Gestionale del salone (agenda), protetto da password e installabile come app |
 | `/listino` `/clienti` `/magazzino` | Sezioni del gestionale, ognuna con il suo link |
 | `/prenotazione-web` `/privacy` `/impostazioni` | Link per le clienti, privacy e GDPR, impostazioni e backup |
-| `/prenota` | Pagina pubblica di prenotazione da condividere con le clienti |
+| `/prenota` | Pagina pubblica di prenotazione da condividere con le clienti (il primo salone) |
+| `/prenota/<nome-salone>` | Pagina di prenotazione di ogni altro salone iscritto |
 
 ## Funzioni
 
@@ -65,6 +66,12 @@ Salone PRO nasce da un gestionale in un singolo file HTML che salvava tutto nel 
 **WhatsApp senza API**
 - Conferme, promemoria e messaggi liberi con un tocco tramite link `wa.me` (anche via SMS).
 - La cliente può mandare la richiesta su WhatsApp e il salone la inserisce in agenda incollando il messaggio.
+
+**Più saloni**
+- Un salone nuovo si iscrive da solo con "Crea il tuo salone": 30 giorni di prova gratuita, il suo listino di partenza e la sua pagina `/prenota/<nome-salone>`. Ogni salone vede solo i suoi dati.
+- Ognuno entra con email e password; il primo salone continua a entrare anche con la password unica (`ADMIN_PASSWORD`).
+- Collaboratori: il titolare crea gli accessi di chi lavora con lui. Usano agenda, clienti, listino e magazzino, ma non vedono impostazioni, SMS, calendario, backup e collaboratori.
+- Pannello Saloni per chi gestisce il servizio (email in `PLATFORM_ADMINS`): i pagamenti sono a mano, quindi un salone si mette su Attivo quando paga, si allunga la prova o si sospende. Un salone sospeso o con la prova finita non entra e non riceve prenotazioni online, ma i dati restano.
 
 **App e offline**
 - Configurazione guidata alla prima installazione: dati del salone, orari, listino e link per le clienti in 4 passi.
@@ -108,8 +115,8 @@ flowchart LR
 ```
 
 - **Frontend:** HTML, CSS e JavaScript senza framework né build. Font Geist e icone Phosphor ospitati sul sito e ridotti ai caratteri usati.
-- **Backend:** funzioni serverless Node su Vercel (`login`, `data`, `public`, `calendar`, `notify`, `cron`) nella regione `fra1`; `cron` gira ogni mattina (promemoria SMS, riepilogo push, pulizia).
-- **Database:** Neon Postgres (piano gratuito), una sola tabella `docs (col, id, data jsonb)` creata da sola alla prima richiesta.
+- **Backend:** funzioni serverless Node su Vercel (`login`, `signup`, `team`, `admin`, `data`, `public`, `calendar`, `notify`, `cron`) nella regione `fra1`; `cron` gira ogni mattina per ogni salone aperto (promemoria SMS, riepilogo push, pulizia).
+- **Database:** Neon Postgres, tabelle create da sole alla prima richiesta: `docs (salon, col, id, data jsonb)` con i dati di ogni salone, `salons` (stato e fine della prova), `users` e `members` (chi lavora in quale salone, come titolare o collaboratore). Un database della versione a salone singolo diventa da solo il salone 1.
 - **Test:** le API girano davvero su un Postgres in memoria (PGlite), senza account né rete.
 
 ```
@@ -122,7 +129,7 @@ public/            gestionale (index.html), prenotazione (prenota.html): solo ma
   js/              il gestionale diviso per sezione (app, api-sync, novita, agenda, listino, clienti,
                    magazzino, impostazioni, avvio) e la pagina di prenotazione (prenota.js)
   sw.js            service worker: pagine dalla rete, cache come riserva
-api/               funzioni serverless (sessione, dati del gestionale, prenotazioni pubbliche, calendario, SMS e notifiche, lavoro del mattino)
+api/               funzioni serverless (sessione, iscrizione, collaboratori, pannello saloni, dati del gestionale, prenotazioni pubbliche, calendario, SMS e notifiche, lavoro del mattino)
 test/              test delle API, della logica offline e dello storico, test nel browser (npm test)
 docs/screenshots/  immagini di questo README
 legacy/            la versione originale in un solo file HTML (v6)
@@ -138,6 +145,8 @@ legacy/            la versione originale in un solo file HTML (v6)
 4. **Primo accesso:** entra nel gestionale con la password (se manca qualcosa, una schermata spiega cosa fare): parte la **configurazione guidata** (nome del salone, WhatsApp, orari, giorni di chiusura, listino e link per le clienti). Si può saltare e riaprire da **Impostazioni & dati**.
 
 5. **SMS e notifiche (facoltativo):** in Vercel aggiungi la variabile `CRON_SECRET` (una frase casuale lunga): senza, il lavoro del mattino (promemoria SMS e riepilogo) non parte. Poi attiva tutto da **Impostazioni & dati**.
+
+6. **Più saloni (facoltativo):** aggiungi `PLATFORM_ADMINS` con le email di chi gestisce il servizio, separate da virgole. Quelle persone, entrate con il loro account, vedono il pannello Saloni in **Impostazioni & dati**. Per vendere il servizio il piano gratuito di Vercel non basta: è riservato all'uso non commerciale.
 
 Le funzioni girano a Francoforte (`vercel.json`) e il database va creato a Francoforte, così i dati restano in Unione Europea.
 

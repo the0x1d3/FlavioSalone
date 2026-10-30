@@ -11,6 +11,8 @@ const initials = (n) => n.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join(
 const sortedClients = () => [...db.clients].sort((a, b) => a.name.localeCompare(b.name, 'it'));
 const empty = (icon, title, text, cta = '') => `<div class="empty"><i class="ph ${icon}" aria-hidden="true"></i><p><strong>${title}</strong></p><p class="muted">${text}</p>${cta}</div>`;
 const anyModalOpen = () => !!document.querySelector('.modal-backdrop.open');
+// This salon's booking page: /prenota/<slug>; the first salon keeps plain /prenota (links already shared with clients).
+const bookingPath = () => (!db.account || db.account.salon === 1 ? '/prenota' : '/prenota/' + db.account.slug);
 
 // ---------- Navigation: one address per section (rewritten to this page in vercel.json) ----------
 const ROUTES = { agenda: '/', listino: '/listino', clienti: '/clienti', magazzino: '/magazzino', webbooking: '/prenotazione-web', gdpr: '/privacy', backup: '/impostazioni' };
@@ -31,9 +33,9 @@ function showTab(tab, push = true) {
   if (push && location.pathname !== ROUTES[tab]) history.pushState(null, '', ROUTES[tab]);
   closeModal('more-sheet');
   window.scrollTo(0, 0);
-  if (tab === 'webbooking') $('preview-frame').src = '/prenota';
+  if (tab === 'webbooking') $('preview-frame').src = bookingPath();
   if (tab === 'clienti') renderRecall(); // appointments may have changed since the last render
-  if (tab === 'backup') { loadCalendarLink(); renderErrorLog(); loadNotify(); }
+  if (tab === 'backup') { loadCalendarLink(); renderErrorLog(); loadNotify(); loadTeam(); loadSalons(); }
 }
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-tab]');
@@ -50,4 +52,5 @@ function renderAll() {
   renderInventory();
   renderGdpr();
   renderWebLink();
+  renderAccount();
 }

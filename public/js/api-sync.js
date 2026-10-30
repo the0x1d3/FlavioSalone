@@ -155,7 +155,7 @@ async function reload() {
     if (!loaded && isNetwork(e) && (fresh = readJSON('sp_cache'))) {
       // start offline from the copy saved on this device (queued changes are already inside it)
     } else {
-      if (e.setup) return showSetup(e.setup);
+      if (e.setup) return showSetup(e.setup, e.message);
       if (!loaded && !$('login').classList.contains('open')) {
         document.body.classList.add('ready'); // show the app only to explain the problem
         $('agenda-list').innerHTML = isNetwork(e)
@@ -171,7 +171,7 @@ async function reload() {
   saveCache();
   const first = !loaded;
   if (first) { loaded = true; loadConfigUI(); }
-  if (first && $('tab-backup').classList.contains('active')) { loadCalendarLink(); loadNotify(); }
+  if (first && $('tab-backup').classList.contains('active')) { loadCalendarLink(); loadNotify(); loadTeam(); loadSalons(); }
   renderAll();
   // createdAt check: a restored backup full of old web bookings must not ring
   if (known) announce(db.appointments.filter((a) => a.source === 'web' && !known.has(a.id) && Date.now() - Date.parse(a.createdAt) < 864e5));
@@ -205,15 +205,40 @@ const SETUP = {
       "Vai in <strong>Deployments</strong> e fai <strong>Redeploy</strong> dell'ultimo deploy.",
     ],
   },
+  // Trial over or salon suspended (payments are handled by hand): nothing to fix on Vercel.
+  closed: {
+    title: 'Salone non attivo',
+    text: (msg) => `${msg}. I tuoi dati restano salvati: per riattivare il salone contatta chi gestisce Salone PRO.`,
+    steps: [],
+  },
 };
-function showSetup(kind) {
+function showSetup(kind, message) {
   const s = SETUP[kind] || SETUP.database;
   $('setup-title').textContent = s.title;
-  $('setup-text').textContent = s.text;
+  $('setup-text').textContent = typeof s.text === 'function' ? s.text(message) : s.text;
   $('setup-steps').innerHTML = s.steps.map((t) => `<li>${t}</li>`).join('');
+  $('setup-vercel').hidden = kind === 'closed';
+  $('setup-logout').hidden = kind !== 'closed';
   closeModal('login');
+  closeModal('signup');
   openModal('setup');
 }
+
+// Another salon on this device: its offline copy and the changes still queued for it must not reach the new one.
+// Copies saved before accounts existed belong to salon 1.
+function enterSalon(salon) {
+  const prev = readJSON('sp_cache');
+  if ((!prev && !outbox.length) || (prev?.account?.salon ?? 1) === salon) return false;
+  outbox = [];
+  forget('sp_outbox');
+  forget('sp_cache');
+  location.reload();
+  return true;
+}
+const switchAuth = (to) => {
+  closeModal(to === 'signup' ? 'login' : 'signup');
+  openModal(to);
+};
 
 async function login(e) {
   e.preventDefault();
@@ -221,15 +246,40 @@ async function login(e) {
   btn.disabled = true;
   $('login-err').textContent = '';
   try {
-    const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: $('login-pw').value }) });
+    const body = { email: $('login-email').value.trim() || undefined, password: $('login-pw').value }; // no email: the salon's shared password
+    const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const d = await r.json().catch(() => ({}));
     if (d.setup) return showSetup(d.setup);
     if (!r.ok) throw new Error(d.error || 'Accesso non riuscito');
     $('login-pw').value = '';
+    if (enterSalon(d.salon)) return;
     closeModal('login');
     await reload();
   } catch (err) {
     $('login-err').textContent = err.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// "Crea il tuo salone": a new salon in free trial, already logged in.
+async function signup(e) {
+  e.preventDefault();
+  const btn = e.submitter;
+  btn.disabled = true;
+  $('signup-err').textContent = '';
+  try {
+    const body = { salonName: $('su-salon').value, name: $('su-name').value, email: $('su-email').value, password: $('su-pw').value };
+    const r = await fetch('/api/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const d = await r.json().catch(() => ({}));
+    if (d.setup) return showSetup(d.setup);
+    if (!r.ok) throw new Error(d.error || 'Registrazione non riuscita');
+    $('su-pw').value = '';
+    if (enterSalon(d.salon)) return;
+    closeModal('signup');
+    await reload();
+  } catch (err) {
+    $('signup-err').textContent = isNetwork(err) ? 'Serve la connessione a internet' : err.message;
   } finally {
     btn.disabled = false;
   }
@@ -314,7 +364,9 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').cat
 // ---------- Actions (data-click & co. in index.html and in the templates above, see common.js) ----------
 Object.assign(actions.click, {
   reload, showNewBookings, dismissBookings, copyErrorLog, clearErrorLog,
+  switchAuth: (el) => switchAuth(el.dataset.arg),
   logout: () => logout(),
   logoutAll: () => logout(true),
 });
 actions.submit.login = (el, e) => login(e);
+actions.submit.signup = (el, e) => signup(e);

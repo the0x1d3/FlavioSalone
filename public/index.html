@@ -262,7 +262,7 @@
 
       <!-- IMPOSTAZIONI -->
       <section id="tab-backup" class="section">
-        <div class="panel pad">
+        <div class="panel pad owner-only">
           <h3>Dati del salone e orari</h3>
           <p class="muted">Compaiono nella pagina di prenotazione e nell'informativa privacy.</p>
           <div class="form-grid" style="margin-top:18px">
@@ -292,7 +292,7 @@
           </div>
         </div>
 
-        <div class="panel pad">
+        <div class="panel pad owner-only">
           <h3>Ferie, festivi e pause</h3>
           <p class="muted">In questi momenti le clienti non possono prenotare online. In agenda li vedi segnati.</p>
           <div class="field" style="margin-top:18px">
@@ -308,7 +308,7 @@
           <div class="row-wrap"><button class="btn btn-primary" data-click="saveClosures"><i class="ph ph-floppy-disk" aria-hidden="true"></i>Salva ferie e pause</button></div>
         </div>
 
-        <div class="panel pad">
+        <div class="panel pad owner-only">
           <h3>Calendario del telefono</h3>
           <p class="muted">Gli appuntamenti, anche quelli prenotati online, compaiono da soli in Google Calendar e quindi nel calendario di Android. Google rilegge il calendario per conto suo, di solito ogni qualche ora: le prenotazioni nuove le vedi subito qui nel gestionale.</p>
           <ol class="steps">
@@ -323,7 +323,7 @@
           <p class="muted small" style="margin-top:14px">Il link è segreto: chi lo ha vede nomi e telefoni delle clienti, quindi non condividerlo. Se finisce in mani sbagliate usa "Esci da tutti i dispositivi": il link cambia e va aggiunto di nuovo.</p>
         </div>
 
-        <div class="panel pad">
+        <div class="panel pad owner-only">
           <div class="panel-title"><h3>Notifiche sul telefono</h3><span class="badge" id="push-badge"></span></div>
           <p class="muted">Il telefono ti avvisa anche con l'app chiusa e lo schermo bloccato: nuove prenotazioni online e, ogni mattina, il riepilogo della giornata. Va attivato su ogni telefono o tablet che vuoi far suonare.</p>
           <div class="row-wrap"><button class="btn btn-ghost btn-sm" data-click="openGuide" data-arg="push"><i class="ph ph-book-open" aria-hidden="true"></i>Guida passo passo</button></div>
@@ -343,7 +343,7 @@
           <p class="hint" id="push-devices"></p>
         </div>
 
-        <div class="panel pad">
+        <div class="panel pad owner-only">
           <div class="panel-title"><h3>SMS automatici alle clienti</h3><span class="badge" id="sms-badge"></span></div>
           <p class="muted">Partono dal telefono del salone con la sua SIM, quindi non costano nulla oltre al tuo piano: una conferma appena l'appuntamento è preso (anche online) e un promemoria il giorno prima, verso le 8.</p>
           <div class="row-wrap"><button class="btn btn-ghost btn-sm" data-click="openGuide" data-arg="sms"><i class="ph ph-book-open" aria-hidden="true"></i>Guida passo passo</button></div>
@@ -396,7 +396,7 @@
           <div class="err-log sms-log" id="sms-log"></div>
         </div>
 
-        <div class="panel pad">
+        <div class="panel pad owner-only">
           <h3>Backup dei dati</h3>
           <p class="muted">I dati sono nel database online. Scarica comunque un backup ogni tanto.</p>
           <div class="row-wrap">
@@ -426,11 +426,35 @@
         </div>
 
         <div class="panel pad">
+          <h3>Il tuo account</h3>
+          <p class="muted" id="account-info"></p>
+        </div>
+
+        <div class="panel pad owner-only">
+          <h3>Collaboratori</h3>
+          <p class="muted">Chi lavora con te entra con la sua email e la sua password: usa agenda, clienti, listino e magazzino, ma non vede queste impostazioni.</p>
+          <div class="err-log sms-log" id="team-list"></div>
+          <form class="form-grid field-gap" data-submit="addMember">
+            <div class="field"><label for="tm-name">Nome e cognome</label><input type="text" id="tm-name" autocomplete="off" required></div>
+            <div class="field"><label for="tm-email">Email</label><input type="email" id="tm-email" autocomplete="off" required></div>
+            <div class="field"><label for="tm-pw">Password (almeno 8 caratteri)</label><input type="text" id="tm-pw" autocomplete="off" minlength="8" required></div>
+            <div class="field"><span class="label">&nbsp;</span><button class="btn btn-primary" type="submit"><i class="ph ph-user-plus" aria-hidden="true"></i>Aggiungi collaboratore</button></div>
+          </form>
+          <p class="hint">Comunica tu email e password al collaboratore. Se lo togli, esce subito da tutti i dispositivi.</p>
+        </div>
+
+        <div class="panel pad platform-only">
+          <h3>Saloni</h3>
+          <p class="muted">Tutti i saloni iscritti. I pagamenti sono gestiti a mano: quando un salone paga mettilo su Attivo, alla fine della prova si blocca da solo, con Sospeso lo blocchi tu.</p>
+          <div class="err-log sms-log field-gap" id="salons-list"></div>
+        </div>
+
+        <div class="panel pad">
           <h3>Sessione</h3>
           <p class="muted">Esci da questo dispositivo. Se perdi un tablet o un telefono, esci da tutti: servirà di nuovo la password ovunque e il link del calendario cambia.</p>
           <div class="row-wrap">
             <button class="btn btn-outline" data-click="logout"><i class="ph ph-sign-out" aria-hidden="true"></i>Esci</button>
-            <button class="btn btn-danger" data-click="logoutAll"><i class="ph ph-devices" aria-hidden="true"></i>Esci da tutti i dispositivi</button>
+            <button class="btn btn-danger owner-only" data-click="logoutAll"><i class="ph ph-devices" aria-hidden="true"></i>Esci da tutti i dispositivi</button>
           </div>
         </div>
       </section>
@@ -887,7 +911,8 @@
     </div>
     <ol class="setup-steps" id="setup-steps"></ol>
     <div class="modal-foot">
-      <a class="btn btn-outline" href="https://vercel.com/dashboard" target="_blank" rel="noopener"><i class="ph ph-arrow-square-out" aria-hidden="true"></i>Apri Vercel</a>
+      <a class="btn btn-outline" id="setup-vercel" href="https://vercel.com/dashboard" target="_blank" rel="noopener"><i class="ph ph-arrow-square-out" aria-hidden="true"></i>Apri Vercel</a>
+      <button class="btn btn-outline" id="setup-logout" data-click="logout" hidden><i class="ph ph-sign-out" aria-hidden="true"></i>Esci</button>
       <button class="btn btn-primary" data-click="reloadPage"><i class="ph ph-arrow-clockwise" aria-hidden="true"></i>Ho fatto, riprova</button>
     </div>
   </div>
@@ -902,11 +927,34 @@
       <p class="muted">Area riservata al salone</p>
     </div>
     <div class="field">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" autocomplete="username">
+      <span class="hint">Entri con la sola password del salone? Lascia vuota l'email.</span>
+    </div>
+    <div class="field">
       <label for="login-pw">Password</label>
       <input type="password" id="login-pw" autocomplete="current-password" required>
     </div>
     <p class="error-text" id="login-err" role="alert"></p>
     <button class="btn btn-primary" type="submit">Entra</button>
+    <button class="ob-skip" type="button" data-click="switchAuth" data-arg="signup">Nuovo su Salone PRO? Crea il tuo salone</button>
+  </form>
+</div>
+
+<div class="modal-backdrop" id="signup" data-locked="1">
+  <form class="modal login-card" data-submit="signup">
+    <span class="brand-mark" aria-hidden="true"><i class="ph ph-scissors" aria-hidden="true"></i></span>
+    <div>
+      <h2>Crea il tuo salone</h2>
+      <p class="muted">30 giorni di prova gratuita, senza carta di credito.</p>
+    </div>
+    <div class="field"><label for="su-salon">Nome del salone</label><input type="text" id="su-salon" autocomplete="organization" maxlength="80" required></div>
+    <div class="field"><label for="su-name">Nome e cognome</label><input type="text" id="su-name" autocomplete="name" maxlength="80" required></div>
+    <div class="field"><label for="su-email">Email</label><input type="email" id="su-email" autocomplete="email" required></div>
+    <div class="field"><label for="su-pw">Password (almeno 8 caratteri)</label><input type="password" id="su-pw" autocomplete="new-password" minlength="8" required></div>
+    <p class="error-text" id="signup-err" role="alert"></p>
+    <button class="btn btn-primary" type="submit">Crea il salone</button>
+    <button class="ob-skip" type="button" data-click="switchAuth" data-arg="login">Hai già un account? Accedi</button>
   </form>
 </div>
 

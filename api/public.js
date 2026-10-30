@@ -1,11 +1,19 @@
-import { handle, fail, db, addMin, romeNow, limit, hit, clientIp, closureOn, durationOf, icsFile, DAY, HHMM, DEFAULT_CONFIG } from './_lib.js';
+import { handle, fail, db, addMin, romeNow, limit, hit, clientIp, closureOn, durationOf, icsFile, salonOpen, DAY, HHMM, DEFAULT_CONFIG } from './_lib.js';
 import { afterNewAppointment } from './_notify.js';
 
 const PUBLIC_CONFIG = ['salonName', 'ownerName', 'address', 'vat', 'email', 'ownerPhone', 'openTime', 'closeTime', 'slotMinutes', 'closedDays', 'serviceFolders', 'breaks', 'closures'];
 const pick = (o, keys) => Object.fromEntries(keys.map((k) => [k, o[k]]));
 
-async function loadSalon(sql) {
-  const rows = await sql`SELECT col, data FROM docs WHERE col IN ('config', 'services') ORDER BY id`;
+// The page /prenota/<slug> asks with ?salon=<slug>; plain /prenota is salon 1 (links shared before multi-salon).
+async function findSalon(sql, slug) {
+  const [s] = slug ? await sql`SELECT id, status, trial_end::text AS trial_end FROM salons WHERE slug = ${String(slug)}`
+    : await sql`SELECT id, status, trial_end::text AS trial_end FROM salons WHERE id = 1`;
+  if (!s || !salonOpen(s)) fail(404, 'Questo salone non accetta prenotazioni online');
+  return Number(s.id);
+}
+
+async function loadSalon(sql, S) {
+  const rows = await sql`SELECT col, data FROM docs WHERE salon = ${S} AND col IN ('config', 'services') ORDER BY id`;
   return {
     config: { ...DEFAULT_CONFIG, ...rows.find((r) => r.col === 'config')?.data },
     services: rows.filter((r) => r.col === 'services').map((r) => pick(r.data, ['id', 'name', 'cat', 'price', 'duration'])),
@@ -15,7 +23,8 @@ async function loadSalon(sql) {
 // Public API for the client booking page: no names or phone numbers ever leave through here.
 export default handle(async (req, res) => {
   const sql = await db();
-  const { config, services } = await loadSalon(sql);
+  const S = await findSalon(sql, req.query.salon);
+  const { config, services } = await loadSalon(sql, S);
   const now = romeNow();
 
   // "Aggiungi al calendario" after booking (iPhone opens it straight in Calendar). Only date, time and service ids
@@ -41,7 +50,7 @@ export default handle(async (req, res) => {
     // Daily breaks are sent as busy intervals, so the booking page needs no extra logic for them.
     const busy = DAY.test(date)
       ? [...await sql`SELECT data->>'time' AS time, data->>'end' AS "end" FROM docs
-                  WHERE col = 'appointments' AND data->>'date' = ${date} AND data->>'end' IS NOT NULL`,
+                  WHERE salon = ${S} AND col = 'appointments' AND data->>'date' = ${date} AND data->>'end' IS NOT NULL`,
         ...config.breaks.map((x) => ({ time: x.from, end: x.to }))]
       : [];
     res.setHeader('Cache-Control', 'no-store');
@@ -84,7 +93,7 @@ export default handle(async (req, res) => {
   if (config.breaks.some((x) => time < x.to && x.from < end)) fail(400, "L'orario scelto cade nella pausa del salone");
 
   const [existing] = await sql`SELECT data->'id' AS id FROM docs
-    WHERE col = 'clients' AND right(regexp_replace(data->>'phone', '[^0-9]', '', 'g'), 10) = ${digits.slice(-10)} LIMIT 1`;
+    WHERE salon = ${S} AND col = 'clients' AND right(regexp_replace(data->>'phone', '[^0-9]', '', 'g'), 10) = ${digits.slice(-10)} LIMIT 1`;
   const id = Date.now() * 100 + Math.floor(Math.random() * 100); // unique even for bookings in the same millisecond
   const clientId = existing ? Number(existing.id) : id + 1;
   const appt = {
@@ -94,25 +103,25 @@ export default handle(async (req, res) => {
   };
   const client = { id: clientId, name, phone, allergy: 'Nessuna', formula: '', gdprConsent: true, gdprDate: now.date, source: 'web' };
 
-  // The advisory lock serialises concurrent bookings, so two clients can never take the same slot.
+  // The advisory lock serialises concurrent bookings of a salon, so two clients can never take the same slot.
   const [, [result]] = await sql.transaction([
-    sql`SELECT pg_advisory_xact_lock(4242)`,
+    sql`SELECT pg_advisory_xact_lock(4242, ${S}::int)`,
     sql`WITH a AS (
-          INSERT INTO docs (col, id, data)
-          SELECT 'appointments', ${id}, ${JSON.stringify(appt)}::jsonb
+          INSERT INTO docs (salon, col, id, data)
+          SELECT ${S}, 'appointments', ${id}, ${JSON.stringify(appt)}::jsonb
           WHERE NOT EXISTS (
-            SELECT 1 FROM docs WHERE col = 'appointments' AND data->>'date' = ${date}
+            SELECT 1 FROM docs WHERE salon = ${S} AND col = 'appointments' AND data->>'date' = ${date}
             AND data->>'time' < ${end} AND data->>'end' > ${time})
           RETURNING id),
         c AS (
-          INSERT INTO docs (col, id, data)
-          SELECT 'clients', ${clientId}, ${JSON.stringify(client)}::jsonb
+          INSERT INTO docs (salon, col, id, data)
+          SELECT ${S}, 'clients', ${clientId}, ${JSON.stringify(client)}::jsonb
           WHERE ${!existing} AND EXISTS (SELECT 1 FROM a)
           ON CONFLICT DO NOTHING
           RETURNING id)
         SELECT (SELECT count(*) FROM a)::int AS booked`,
   ]);
   if (!result.booked) fail(409, 'Questo orario è appena stato occupato, scegline un altro');
-  await afterNewAppointment(sql, appt, { push: true }); // confirmation SMS to the client, push to the salon's phones
+  await afterNewAppointment(sql, S, appt, { push: true }); // confirmation SMS to the client, push to the salon's phones
   res.json({ ok: true, appointment: { date, time, end, services: appt.services, price: appt.price } });
 });

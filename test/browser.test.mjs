@@ -119,6 +119,27 @@ test('public booking and confirmation', async () => {
   await admin.locator('#agenda-list .appt', { hasText: 'Lucia Prova' }).getByText('Web').waitFor();
 });
 
+test('sign-up: a second salon, empty, with its own booking page', async () => {
+  const page = await open('/');
+  await page.getByRole('button', { name: 'Crea il tuo salone' }).click();
+  await page.fill('#su-salon', 'Barberia Prova');
+  await page.fill('#su-name', 'Marco Prova');
+  await page.fill('#su-email', 'marco@prova.it');
+  await page.fill('#su-pw', 'password-marco');
+  await page.getByRole('button', { name: 'Crea il salone' }).click();
+  await page.getByRole('button', { name: 'Lo faccio dopo' }).click();
+  await page.locator('#agenda-list', { hasText: 'Nessun appuntamento' }).waitFor(); // nothing from the first salon
+  await page.locator('.sidebar').getByRole('link', { name: 'Prenotazione web' }).click();
+  assert.equal(await page.inputValue('#public-link'), base + '/prenota/barberia-prova');
+  await page.locator('.sidebar').getByRole('link', { name: 'Impostazioni & dati' }).click();
+  await page.locator('#account-info', { hasText: 'Prova gratuita fino al' }).waitFor();
+  await page.locator('#team-list', { hasText: 'Marco Prova' }).waitFor();
+  assert.equal(await page.isVisible('#salons-list'), false, 'the salons panel is for PLATFORM_ADMINS only');
+
+  const booking = await open('/prenota/barberia-prova');
+  await booking.locator('#salon-title', { hasText: 'Barberia Prova' }).waitFor();
+});
+
 test('no page errors or CSP violations', () => {
   assert.deepEqual(problems, []);
 });

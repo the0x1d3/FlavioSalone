@@ -23,7 +23,7 @@ function call(handler, { method = 'GET', query = {}, body, cookie, ip = '10.0.0.
       json(b) { resolve({ status: this.statusCode, body: b, headers: this.headers }); },
       send(b) { resolve({ status: this.statusCode, body: b, headers: this.headers }); },
     };
-    handler({ method, query, body, headers: { cookie, 'x-real-ip': ip } }, res);
+    handler({ method, query, body, headers: { cookie, 'x-real-ip': ip, host: 'salone.test' } }, res);
   });
 }
 
@@ -239,7 +239,10 @@ test('new web bookings check: counts only web bookings after the given id', asyn
 test('calendar feed: secret link, Italian time, escaped text, revoked by logout-all', async () => {
   const fresh = (await call(login, { method: 'POST', ip: '9.9.9.4', body: { password: process.env.ADMIN_PASSWORD } })).headers['set-cookie'].split(';')[0];
   assert.equal((await call(data, { query: { calendar: '' } })).status, 401);
-  const { token } = (await call(data, { cookie: fresh, query: { calendar: '' } })).body;
+  const link = new URL((await call(data, { cookie: fresh, query: { calendar: '' } })).body.url);
+  assert.equal(link.pathname, '/api/calendar');
+  assert.equal(link.searchParams.get('s'), null, 'salon 1 keeps the links made before multi-salon');
+  const token = link.searchParams.get('k');
   assert.equal((await call(calendar, { query: { k: 'sbagliato' } })).status, 401);
   assert.equal((await call(calendar, {})).status, 401);
 

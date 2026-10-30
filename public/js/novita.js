@@ -1,6 +1,10 @@
 // ---------- Novità ----------
 // Newest first. Add an entry at every update: it pops up once on each device, then stays under "Novità".
 const NEWS = [
+  { v: '1.15', date: '30 ottobre 2026', title: 'Un accesso per ogni collaboratore', items: [
+    ['ph-user-plus', 'In Impostazioni, nel riquadro Collaboratori, crei un accesso per chi lavora con te: entra con la sua email e la sua password, usa agenda, clienti, listino e magazzino, ma non vede le impostazioni del salone.'],
+    ['ph-lock-simple', "Nella schermata di accesso ora c'è anche l'email. Se entri con la password del salone, lascia l'email vuota: funziona come prima."],
+  ] },
   { v: '1.14', date: '24 ottobre 2026', title: 'SMS da iPhone più semplici da attivare', items: [
     ['ph-apple-logo', 'La guida per gli SMS da iPhone è stata riscritta: un passaggio alla volta, con i nomi esatti di Comandi Rapidi, come si inseriscono le variabili e come deve risultare il comando alla fine.'],
     ['ph-clock', "Nel riquadro SMS automatici vedi quando l'iPhone ha controllato l'ultima volta, e un avviso se non lo fa da più di un giorno. Se hai già creato il comando con la guida di prima, funziona ancora."],

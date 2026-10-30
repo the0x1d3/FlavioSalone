@@ -142,7 +142,7 @@ function deleteClient(id) {
 
 // ---------- Da richiamare ----------
 const weeksAgo = (ds) => Math.round((new Date(todayStr() + 'T12:00:00Z') - new Date(ds + 'T12:00:00Z')) / 6048e5);
-const recallText = (c) => `Ciao ${c.name.split(' ')[0]}! È passato un po' di tempo dalla tua ultima visita da ${db.config.salonName}. Quando vuoi, puoi prenotare qui: ${location.origin}/prenota`;
+const recallText = (c) => `Ciao ${c.name.split(' ')[0]}! È passato un po' di tempo dalla tua ultima visita da ${db.config.salonName}. Quando vuoi, puoi prenotare qui: ${location.origin}${bookingPath()}`;
 
 function renderRecall() {
   const weeks = Number(db.config.recallWeeks ?? 6);

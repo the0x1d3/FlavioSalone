@@ -1,6 +1,6 @@
 {
   "name": "salone-pro",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "description": "Gestionale per parrucchieri con prenotazione online, promemoria WhatsApp e modalità offline (PWA su Vercel + Neon).",
   "license": "MIT",
   "private": true,

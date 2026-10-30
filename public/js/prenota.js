@@ -11,8 +11,12 @@ const closureOn = (ds) => (cfg.closures || []).find((x) => ds >= x.from && ds <=
 const isClosed = (ds) => (cfg.closedDays || []).includes(new Date(ds + 'T12:00').getDay()) || !!closureOn(ds);
 const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
 
+// /prenota/<slug> is one salon's page; plain /prenota is the first salon's (links shared before multi-salon).
+const SALON = location.pathname.match(/^\/prenota\/([a-z0-9-]+)/)?.[1];
+const publicApi = (params = {}) => '/api/public?' + new URLSearchParams({ ...(SALON && { salon: SALON }), ...params });
+
 async function fetchDay(date) {
-  const r = await fetch('/api/public' + (date ? '?date=' + date : ''));
+  const r = await fetch(publicApi(date ? { date } : {}));
   const d = await r.json().catch(() => ({}));
   if (!r.ok) throw Object.assign(new Error(d.error || 'Prenotazione online non disponibile'), { setup: d.setup });
   ({ config: cfg, services, busy, now } = d);
@@ -202,7 +206,7 @@ async function submitBooking(mode) {
 
   document.querySelectorAll('.book-btn').forEach((b) => { b.disabled = true; });
   try {
-    const r = await fetch('/api/public', {
+    const r = await fetch(publicApi(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, phone, serviceIds: list.map((s) => s.id), date: selDate, time: selTime, privacy: true, website: $('c-website').value }),
@@ -234,7 +238,7 @@ async function submitBooking(mode) {
     // The .ics comes from the server (same text, reminder 2 hours before), so iPhone opens it straight in Calendar instead of
     // saving it to Files. Samsung Calendar opens it on Samsung phones (Google Calendar's app cannot), Outlook & co. on a computer.
     const [icon, label] = ios ? ['ph-apple-logo', 'Aggiungi su Calendario Apple'] : android ? ['ph-calendar-plus', 'Aggiungi su Calendario Samsung o altro'] : ['ph-download-simple', 'Scarica il file calendario (.ics)'];
-    $('btn-apple-cal').href = `/api/public?ics=1&date=${selDate}&time=${selTime}&s=${list.map((s) => s.id).join(',')}`;
+    $('btn-apple-cal').href = publicApi({ ics: 1, date: selDate, time: selTime, s: list.map((s) => s.id).join(',') });
     $('btn-apple-cal').querySelector('i').className = 'ph ' + icon;
     $('btn-apple-cal').querySelector('span').textContent = label;
     openModal('done-modal');
